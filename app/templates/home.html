@@ -1,0 +1,502 @@
+{% extends "base.html" %}
+
+{% block title %}Marnay Game Store - Premium Game Accounts{% endblock %}
+
+{% block head %}
+<style>
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+        min-height: 460px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.75fr);
+        gap: 2rem;
+        align-items: center;
+        padding: clamp(1.2rem, 4vw, 2.4rem);
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--store-border);
+        border-radius: 18px;
+        background:
+            linear-gradient(135deg, rgba(21, 28, 43, 0.9), rgba(16, 22, 35, 0.96)),
+            radial-gradient(circle at 70% 30%, rgba(56, 189, 248, 0.24), transparent 22rem);
+        box-shadow: var(--store-shadow);
+    }
+
+    .hero-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        min-height: 30px;
+        padding: 0.25rem 0.7rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        color: #bae6fd;
+        background: rgba(56, 189, 248, 0.1);
+        font-size: 0.78rem;
+        font-weight: 800;
+    }
+
+    .hero-title {
+        max-width: 720px;
+        margin: 0;
+        color: #ffffff;
+        font-size: clamp(2.35rem, 7vw, 5rem);
+        line-height: 0.98;
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+
+    .hero-text {
+        max-width: 590px;
+        margin: 1rem 0 0;
+        color: var(--store-muted);
+        font-size: clamp(0.98rem, 2vw, 1.08rem);
+        line-height: 1.75;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.35rem;
+    }
+
+    .hero-btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 10px;
+        padding: 0.65rem 0.95rem;
+        font-size: 0.9rem;
+        font-weight: 800;
+        text-decoration: none;
+        border: 1px solid var(--store-border);
+    }
+
+    .hero-btn.primary {
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.16);
+        background: linear-gradient(135deg, var(--store-purple), #2563eb);
+    }
+
+    .hero-btn.secondary {
+        color: var(--store-soft);
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .hero-visual {
+        position: relative;
+        min-height: 360px;
+        overflow: hidden;
+        border: 1px solid var(--store-border);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .hero-visual img {
+        width: 100%;
+        height: 100%;
+        min-height: 360px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .hero-visual::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(8, 11, 18, 0.72), transparent 55%);
+    }
+
+    .hero-card-caption {
+        position: absolute;
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.8rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        background: rgba(8, 11, 18, 0.72);
+        backdrop-filter: blur(12px);
+    }
+
+    .market-section {
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid var(--store-border);
+        border-radius: 18px;
+        background: rgba(16, 22, 35, 0.72);
+        box-shadow: var(--store-shadow);
+    }
+
+    .section-toolbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: clamp(1.35rem, 3vw, 1.9rem);
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+
+    .section-subtitle {
+        margin: 0.25rem 0 0;
+        color: var(--store-muted);
+        font-size: 0.9rem;
+    }
+
+    .view-all-btn {
+        min-height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        flex: 0 0 auto;
+        border: 1px solid var(--store-border);
+        border-radius: 10px;
+        padding: 0.5rem 0.8rem;
+        color: var(--store-soft);
+        background: rgba(255, 255, 255, 0.04);
+        text-decoration: none;
+        font-size: 0.84rem;
+        font-weight: 800;
+    }
+
+    .listing-slider {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: calc((100% - 2rem) / 3);
+        gap: 1rem;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scroll-snap-type: inline mandatory;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(148, 163, 184, 0.38) transparent;
+        padding-bottom: 0.3rem;
+    }
+
+    .listing-slider > * {
+        scroll-snap-align: start;
+    }
+
+    .market-card {
+        min-width: 0;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid var(--store-border);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(21, 28, 43, 0.95), rgba(15, 23, 42, 0.98));
+        transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .market-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(56, 189, 248, 0.34);
+    }
+
+    .listing-image-wrap {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 16 / 10;
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .listing-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.28s ease;
+    }
+
+    .market-card:hover .listing-image {
+        transform: scale(1.035);
+    }
+
+    .listing-tag {
+        position: absolute;
+        left: 0.75rem;
+        top: 0.75rem;
+        min-height: 26px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        color: #86efac;
+        background: rgba(8, 11, 18, 0.75);
+        backdrop-filter: blur(10px);
+        font-size: 0.72rem;
+        font-weight: 800;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .listing-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.35;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .listing-game {
+        margin: 0.35rem 0 0;
+        color: var(--store-muted);
+        font-size: 0.84rem;
+    }
+
+    .listing-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
+        padding-top: 0.85rem;
+        margin-top: 0.85rem;
+        border-top: 1px solid var(--store-border);
+    }
+
+    .listing-price {
+        color: #ffffff;
+        font-size: 1.35rem;
+        font-weight: 800;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        min-height: 28px;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        color: #ffffff;
+        background: rgba(34, 197, 94, 0.12);
+        font-size: 0.74rem;
+        font-weight: 800;
+    }
+
+    .seller-row {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin-top: 0.9rem;
+    }
+
+    .seller-avatar {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 auto;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 1px solid var(--store-border);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .seller-name {
+        color: var(--store-soft);
+        font-size: 0.82rem;
+        font-weight: 800;
+    }
+
+    .seller-role {
+        color: var(--store-muted);
+        font-size: 0.74rem;
+    }
+
+    .view-btn {
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        width: 100%;
+        margin-top: 1rem;
+        border-radius: 10px;
+        color: #ffffff;
+        background: linear-gradient(135deg, var(--store-purple), #2563eb);
+        text-decoration: none;
+        font-size: 0.86rem;
+        font-weight: 800;
+    }
+
+    .empty-box {
+        padding: 1rem;
+        border: 1px solid var(--store-border);
+        border-radius: 14px;
+        color: var(--store-muted);
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    @media (max-width: 992px) {
+        .hero-section {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-visual {
+            min-height: 300px;
+        }
+
+        .hero-visual img {
+            min-height: 300px;
+        }
+
+        .listing-slider {
+            grid-auto-columns: calc((100% - 1rem) / 2);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .hero-section,
+        .market-section {
+            border-radius: 14px;
+        }
+
+        .hero-actions,
+        .section-toolbar {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .hero-btn,
+        .view-all-btn {
+            width: 100%;
+        }
+
+        .listing-slider {
+            grid-auto-columns: 86%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% macro listing_card(listing) %}
+    <article class="market-card">
+        <div class="listing-image-wrap">
+            <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" class="listing-image" alt="{{ listing.title }}">
+            {% if listing.status == "available" %}
+
+            <span class="listing-tag"><i class="bi bi-check2-circle"></i>available</span>
+
+            {% endif %}
+
+        </div>
+        <div class="card-body">
+            <h3 class="listing-title">{{ listing.title }}</h3>
+            <p class="listing-game">{{ listing.game.name }}</p>
+
+            <div class="listing-meta">
+                <div class="listing-price">{{ listing.price }}</div>
+                {% if listing.featured %}
+                    <span class="status-pill"><i class="bi bi-lightning-charge-fill"></i>For Rental</span>
+
+                {% else %}
+
+                    <span class="status-pill"><i class="bi bi-lightning-charge-fill"></i>For Sale</span>
+
+                {% endif %}
+            </div>
+
+            <div class="seller-row">
+                <img src="{{ url_for('static', filename='uploads/' + (listing.seller.profile_image or 'default.jpg')) }}" class="seller-avatar" alt="{{ listing.seller.username }}">
+                <div>
+                    <div class="seller-name">{{ listing.seller.username }}</div>
+                    <div class="seller-role">Verified Seller</div>
+                </div>
+            </div>
+
+            <a href="/listing/{{ listing.id }}" class="view-btn">
+                View Details
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </article>
+{% endmacro %}
+
+{% macro game_section(title, subtitle, game_id, items) %}
+    <section class="market-section" aria-label="{{ title }} listings">
+        <div class="section-toolbar">
+            <div>
+                <h2 class="section-title">{{ title }}</h2>
+                <p class="section-subtitle">{{ subtitle }}</p>
+            </div>
+            <a href="{% if game_id %}/view-all/{{ game_id }}{% else %}/{% endif %}" class="view-all-btn">
+                View All
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        {% if items|length %}
+            <div class="listing-slider">
+                {% for listing in items %}
+                    {{ listing_card(listing) }}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-box">No {{ title }} listings available right now.</div>
+        {% endif %}
+    </section>
+{% endmacro %}
+
+{% block content %}
+
+
+<section class="hero-section">
+    <div>
+        <span class="hero-kicker"><i class="bi bi-stars"></i>Premium Game Accounts</span>
+        <h1 class="hero-title">Find Battle-Ready Accounts</h1>
+        <p class="hero-text">Browse curated Mobile Legends and PUBG accounts with clear pricing, seller details, and fast contact options.</p>
+        <div class="hero-actions">
+            <a href="#mobile-legends" class="hero-btn primary">
+                <i class="bi bi-controller"></i>
+                Browse Listings
+            </a>
+            <a href="viber://chat?number=+959251355782" target="_blank" class="hero-btn secondary">
+                <i class="bi bi-chat-dots"></i>
+                Contact Seller
+            </a>
+        </div>
+    </div>
+
+    <div class="hero-visual">
+        <img src="{{ url_for('static', filename='images/seller.jpg') }}" alt="Marnay Game Store seller showcase">
+        <div class="hero-card-caption">
+            <div>
+                <div class="text-white fw-bold">Trusted Marketplace</div>
+                <div class="text-secondary small">Verified accounts and direct seller support</div>
+            </div>
+            <i class="bi bi-shield-check text-info fs-4"></i>
+        </div>
+    </div>
+</section>
+
+<div id="mobile-legends">
+    {{ game_section("Mobile Legends", "High-rank accounts, skins, heroes, and ready-to-play profiles.", ml_game_id, ml_listings) }}
+
+
+</div>
+
+<div id="pubg" class="mt-3">
+
+    {{ game_section("PUBG", "Premium PUBG accounts with cosmetics, stats, and competitive inventory.", pubg_game_id, pubg_listings) }}
+</div>
+{% endblock %}

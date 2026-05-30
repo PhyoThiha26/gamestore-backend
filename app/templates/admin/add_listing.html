@@ -1,0 +1,449 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Add Listing - Nexus Admin{% endblock %}
+
+{% block head %}
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .page-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: clamp(1.5rem, 2vw, 2.05rem);
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+
+    .page-subtitle {
+        max-width: 620px;
+        margin: 0.25rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+    }
+
+    .ghost-btn,
+    .submit-btn {
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 10px;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.88rem;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .ghost-btn {
+        color: var(--text-soft);
+        border: 1px solid var(--border-color);
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    .submit-btn {
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: linear-gradient(135deg, #7c3aed, #2563eb);
+        box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+    }
+
+    .form-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .form-panel,
+    .upload-panel,
+    .tips-panel {
+        background: linear-gradient(180deg, rgba(21, 28, 43, 0.92), rgba(16, 22, 35, 0.96));
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: var(--shadow-panel);
+    }
+
+    .form-panel {
+        padding: 1.2rem;
+    }
+
+    .panel-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .panel-heading h2 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .panel-heading p {
+        margin: 0.2rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+    }
+
+    .section-icon {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        border-radius: 10px;
+        color: #7dd3fc;
+        background: rgba(56, 189, 248, 0.13);
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.45rem;
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .admin-input {
+        min-height: 44px;
+        color: var(--text-main) !important;
+        background-color: rgba(3, 7, 18, 0.4) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 10px !important;
+        box-shadow: none !important;
+    }
+
+    textarea.admin-input {
+        min-height: 190px;
+        resize: vertical;
+    }
+
+    .admin-input:focus {
+        border-color: rgba(56, 189, 248, 0.72) !important;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12) !important;
+    }
+
+    .admin-input::placeholder {
+        color: rgba(203, 213, 225, 0.42);
+    }
+
+    select.admin-input option {
+        background: #111827;
+        color: var(--text-main);
+    }
+
+    .side-stack {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .upload-panel {
+        padding: 1rem;
+    }
+
+    .upload-zone {
+        padding: 1rem;
+        border: 1px dashed rgba(148, 163, 184, 0.26);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .upload-zone + .upload-zone {
+        margin-top: 1rem;
+    }
+
+    .upload-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.7rem;
+        color: #ffffff;
+        font-weight: 800;
+        font-size: 0.92rem;
+    }
+
+    .upload-title i {
+        color: #7dd3fc;
+    }
+
+    .upload-hint {
+        margin: -0.35rem 0 0.85rem;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+
+    .live-cover-preview {
+        width: 100%;
+        max-height: 220px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .detail-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.65rem;
+        margin-top: 1rem;
+    }
+
+    .live-detail-preview {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .tips-panel {
+        padding: 1rem;
+    }
+
+    .tips-list {
+        display: grid;
+        gap: 0.75rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .tips-list li {
+        display: flex;
+        gap: 0.65rem;
+        color: var(--text-muted);
+        font-size: 0.84rem;
+        line-height: 1.45;
+    }
+
+    .tips-list i {
+        color: #86efac;
+        margin-top: 0.12rem;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.65rem;
+        padding-top: 1rem;
+        margin-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .preview-modal-content {
+        background: transparent !important;
+        border: 0 !important;
+    }
+
+    .modal-preview-image {
+        width: 100%;
+        max-height: 85vh;
+        object-fit: contain;
+        border-radius: 12px;
+    }
+
+    @media (max-width: 1100px) {
+        .form-shell {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .page-header,
+        .form-actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .ghost-btn,
+        .submit-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1 class="page-title">Add New Listing</h1>
+        <p class="page-subtitle">Create a marketplace-ready account listing with pricing, game context, and visual proof.</p>
+    </div>
+    <a href="/admin/admin-listings" class="ghost-btn">
+        <i class="bi bi-arrow-left"></i>
+        Back to Listings
+    </a>
+</header>
+
+<form method="POST" enctype="multipart/form-data">
+    <div class="form-shell">
+        <section class="form-panel" aria-label="Listing details">
+            <div class="panel-heading">
+                <div>
+                    <h2>Listing Details</h2>
+                    <p>Core catalog information buyers will scan first</p>
+                </div>
+                <div class="section-icon"><i class="bi bi-card-text"></i></div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" for="listingTitle">Listing Title</label>
+                <input id="listingTitle" type="text" name="title" class="form-control admin-input" placeholder="Example: Mythic Glory Account" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" for="listingDescription">Description</label>
+                <textarea id="listingDescription" name="description" rows="8" class="form-control admin-input" placeholder="Describe skins, ranks, heroes, weapons, achievements, badges, and rare details..." required></textarea>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label" for="listingPrice">Selling Price</label>
+                    <input id="listingPrice"  step="0.01" name="price" class="form-control admin-input" placeholder="100.00" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="buyPrice">Buy Cost</label>
+                    <input id="buyPrice" type="number" step="0.01" name="buy_price" class="form-control admin-input" placeholder="Optional">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="gameId">Target Game</label>
+                    <select id="gameId" name="game_id" class="form-select admin-input" required>
+                        <option value="" disabled selected hidden>Select a game</option>
+                        {% for game in games %}
+                            <option value="{{ game.id }}">{{ game.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="/admin/admin-listings" class="ghost-btn">Cancel</a>
+                <button type="submit" class="submit-btn">
+                    <i class="bi bi-cloud-arrow-up"></i>
+                    Publish Listing
+                </button>
+            </div>
+        </section>
+
+        <aside class="side-stack">
+            <section class="upload-panel" aria-label="Listing images">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Images</h2>
+                        <p>Cover and proof screenshots</p>
+                    </div>
+                    <div class="section-icon"><i class="bi bi-images"></i></div>
+                </div>
+
+                <div class="upload-zone">
+                    <div class="upload-title">
+                        <span>Cover Image</span>
+                        <i class="bi bi-image"></i>
+                    </div>
+                    <p class="upload-hint">Main catalog thumbnail.</p>
+                    <input type="file" name="image" class="form-control admin-input" id="coverInput" accept="image/*" required>
+                    <div id="coverPreview" class="mt-3 d-none"></div>
+                </div>
+
+                <div class="upload-zone">
+                    <div class="upload-title">
+                        <span>Detail Images</span>
+                        <i class="bi bi-grid-3x3-gap"></i>
+                    </div>
+                    <p class="upload-hint">Add multiple screenshots for buyer confidence.</p>
+                    <input type="file" name="detail_images" multiple class="form-control admin-input" id="detailInput" accept="image/*">
+                    <div id="detailPreview" class="detail-preview-grid"></div>
+                </div>
+            </section>
+
+            <section class="tips-panel" aria-label="Publishing tips">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Quality Checks</h2>
+                        <p>Before publishing</p>
+                    </div>
+                    <div class="section-icon"><i class="bi bi-check2-square"></i></div>
+                </div>
+                <ul class="tips-list">
+                    <li><i class="bi bi-check2"></i><span>Use a short, specific title with game, rank, or rarity.</span></li>
+                    <li><i class="bi bi-check2"></i><span>Show proof screenshots that match the description.</span></li>
+                    <li><i class="bi bi-check2"></i><span>Keep buy cost accurate so profit reporting stays useful.</span></li>
+                </ul>
+            </section>
+        </aside>
+    </div>
+</form>
+
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content preview-modal-content">
+            <div class="modal-body p-0 text-center">
+                <img id="modalPreviewImage" class="modal-preview-image" alt="Image preview">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const previewModal = document.getElementById("previewModal");
+    const modalPreviewImage = document.getElementById("modalPreviewImage");
+
+    function createPreviewImage(file, className) {
+        const image = document.createElement("img");
+        image.src = URL.createObjectURL(file);
+        image.classList.add(className);
+        image.setAttribute("data-bs-toggle", "modal");
+        image.setAttribute("data-bs-target", "#previewModal");
+        image.setAttribute("data-image", image.src);
+        return image;
+    }
+
+    document.getElementById("coverInput").addEventListener("change", function (event) {
+        const coverPreview = document.getElementById("coverPreview");
+        const file = event.target.files[0];
+        coverPreview.innerHTML = "";
+
+        if (file) {
+            coverPreview.classList.remove("d-none");
+            coverPreview.appendChild(createPreviewImage(file, "live-cover-preview"));
+        } else {
+            coverPreview.classList.add("d-none");
+        }
+    });
+
+    document.getElementById("detailInput").addEventListener("change", function (event) {
+        const detailPreview = document.getElementById("detailPreview");
+        detailPreview.innerHTML = "";
+
+        Array.from(event.target.files).forEach((file) => {
+            detailPreview.appendChild(createPreviewImage(file, "live-detail-preview"));
+        });
+    });
+
+    previewModal.addEventListener("show.bs.modal", function (event) {
+        modalPreviewImage.src = event.relatedTarget.getAttribute("data-image");
+    });
+});
+</script>
+{% endblock %}

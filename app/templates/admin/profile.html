@@ -1,0 +1,277 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<style>
+    /* Page Specific Layout Utilities */
+    .dashboard-title {
+        font-weight: 700;
+        letter-spacing: -1px;
+    }
+
+    /* Core Form Card Design Architecture */
+    .admin-form-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Form Section Labels Styling */
+    .form-label {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Premium Dark Theme Custom Inputs Framework */
+    .admin-input {
+        background-color: rgba(0, 0, 0, 0.2) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-main) !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.95rem;
+        transition: all 0.2s ease !important;
+    }
+    .admin-input:focus {
+        border-color: var(--accent-primary) !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+    }
+    
+    /* Pre-linked Input Group Icons System Add-on */
+    .input-group-text-admin {
+        background-color: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid var(--border-color) !important;
+        border-right: none !important;
+        color: var(--text-muted);
+        border-radius: 10px 0 0 10px !important;
+        padding: 0 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .input-group-text-admin + .admin-input {
+        border-radius: 0 10px 10px 0 !important;
+    }
+
+    /* Circular Avatar Engine Block Components */
+    .profile-upload-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 2rem 1.5rem;
+    }
+    .profile-upload-wrapper {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        margin-bottom: 1.5rem;
+    }
+    .profile-preview-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .avatar-hidden-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 5;
+    }
+    .avatar-edit-badge {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        background: var(--accent-primary);
+        color: #fff;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        border: 3px solid #111625;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+        transition: transform 0.2s ease;
+    }
+    .profile-upload-wrapper:hover .avatar-edit-badge {
+        transform: scale(1.1);
+    }
+
+    /* Metric Aggregation Info Boxes */
+    .profile-stats-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        width: 100%;
+        margin-top: 1.25rem;
+    }
+    .profile-stat-box {
+        background: rgba(0, 0, 0, 0.15);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+    }
+    .profile-stat-box h4 {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.4rem;
+        margin-bottom: 0.15rem;
+        letter-spacing: -0.5px;
+    }
+    .profile-stat-box p {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0;
+    }
+
+    /* Dynamic Profile Control Actions */
+    .save-profile-btn {
+        background: var(--accent-primary);
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        padding: 0.85rem 2.5rem;
+        border-radius: 10px;
+        width: 100%;
+        transition: opacity 0.2s ease;
+    }
+    .save-profile-btn:hover {
+        opacity: 0.9;
+    }
+</style>
+
+<div class="profile-page">
+    <!-- HEADER LAYER -->
+    <div class="mb-4">
+        <h2 class="dashboard-title text-white mb-1">Seller Profile</h2>
+        <p class="text-secondary small mb-0">Manage and configure your public communications interface information</p>
+    </div>
+
+    <!-- MAIN CONFIGURATION MATRIX GRID -->
+    <form method="POST" enctype="multipart/form-data">
+        <div class="row g-4">
+            
+            <!-- LEFT COLUMN MODULE: AVATAR CORE AND METRIC SNAPSHOT -->
+            <div class="col-lg-4">
+                <div class="profile-upload-panel">
+                    <label class="form-label mb-3">Identity Avatar</label>
+                    
+                    <div class="profile-upload-wrapper">
+                        <img src="{{ url_for('static', filename='uploads/' + (user.profile_image or 'default.jpg')) }}" 
+                             class="profile-preview-image" 
+                             id="profilePreview" 
+                             alt="Seller Avatar Image Source">
+                        <input type="file" name="profile_image" class="avatar-hidden-input" id="profileInput" accept="image/*">
+                        <div class="avatar-edit-badge">
+                            <i class="bi bi-camera"></i>
+                        </div>
+                    </div>
+                    
+                    <span class="text-white small font-medium mb-1">{{ user.username }}</span>
+                    <span class="text-secondary font-monospace mb-2" style="font-size: 0.72rem;">UID Account Linked</span>
+
+                    <!-- DATA INTEGRATION STORAGE METRICS CARD -->
+                    <div class="profile-stats-container">
+                        <div class="profile-stat-box">
+                            <h4>{{ user.listings|length }}</h4>
+                            <p>Listings</p>
+                        </div>
+                        <div class="profile-stat-box">
+                            <h4>{{ user.listings|selectattr("status", "equalto", "sold")|list|length }}</h4>
+                            <p>Sold</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN MODULE: NETWORKING LINKS FORM LAYOUT -->
+            <div class="col-lg-8">
+                <div class="admin-form-card d-flex flex-column h-100 justify-content-between">
+                    <div>
+                        <!-- TELEGRAM PARAMETER OPTION -->
+                        <div class="mb-4">
+                            <label class="form-label">Telegram Contact Link</label>
+                            <div class="input-group">
+                                <span class="input-group-text-admin"><i class="bi bi-telegram"></i></span>
+                                <input type="text" name="telegram" class="form-control admin-input" placeholder="https://t.me/yourusername" value="{{ user.telegram or '' }}">
+                            </div>
+                        </div>
+
+                        <!-- MESSENGER PARAMETER OPTION -->
+                        <div class="mb-4">
+                            <label class="form-label">Facebook Messenger Link</label>
+                            <div class="input-group">
+                                <span class="input-group-text-admin"><i class="bi bi-messenger"></i></span>
+                                <input type="text" name="messenger" class="form-control admin-input" placeholder="https://m.me/yourusername" value="{{ user.messenger or '' }}">
+                            </div>
+                        </div>
+
+                        <!-- VIBER PARAMETER OPTION -->
+                        <div class="mb-4">
+                            <label class="form-label">Viber Account Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text-admin"><i class="bi bi-chat-left-dots"></i></span>
+                                <input type="text" name="viber" class="form-control admin-input" placeholder="Enter Viber telephone profile identifier" value="{{ user.viber or '' }}">
+                            </div>
+                        </div>
+
+                        <!-- PHONE CONTACT PARAMETER OPTION -->
+                        <div class="mb-4">
+                            <label class="form-label">Voice Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text-admin"><i class="bi bi-telephone"></i></span>
+                                <input type="text" name="phone" class="form-control admin-input" placeholder="+1234567890" value="{{ user.phone or '' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBMIT TRIGGER BUTTON CONTROL -->
+                    <div class="mt-2 pt-3 border-top border-secondary border-opacity-10">
+                        <button type="submit" class="save-profile-btn shadow-sm">
+                            Save Profile Specifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<!-- FILE PIPELINE REALTIME ASSET RENDER LAYER -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const profileInput = document.getElementById("profileInput");
+    const profilePreview = document.getElementById("profilePreview");
+
+    profileInput.addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            profilePreview.src = URL.createObjectURL(file);
+        }
+    });
+});
+</script>
+{% endblock %}

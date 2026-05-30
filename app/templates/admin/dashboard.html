@@ -1,0 +1,647 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Dashboard - Nexus Admin{% endblock %}
+
+{% block head %}
+<style>
+    .dashboard-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .dashboard-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: clamp(1.55rem, 2vw, 2.15rem);
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+
+    .dashboard-subtitle {
+        max-width: 640px;
+        margin: 0.25rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .ghost-btn,
+    .primary-btn {
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: 10px;
+        padding: 0.55rem 0.85rem;
+        font-size: 0.85rem;
+        font-weight: 750;
+        text-decoration: none;
+    }
+
+    .ghost-btn {
+        color: var(--text-soft);
+        border: 1px solid var(--border-color);
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    .primary-btn {
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: linear-gradient(135deg, #7c3aed, #2563eb);
+        box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+    }
+
+    .insight-strip {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(150px, 1fr));
+        gap: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-panel,
+    .quick-panel,
+    .stats-card,
+    .analytics-card,
+    .admin-table-card {
+        background: linear-gradient(180deg, rgba(21, 28, 43, 0.92), rgba(16, 22, 35, 0.96));
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-panel);
+    }
+
+    .hero-panel {
+        position: relative;
+        overflow: hidden;
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        border-radius: 16px;
+        padding: 1.25rem;
+    }
+
+    .hero-panel::after {
+        content: "";
+        position: absolute;
+        inset: auto -4rem -7rem auto;
+        width: 15rem;
+        height: 15rem;
+        border-radius: 999px;
+        background: rgba(56, 189, 248, 0.18);
+        filter: blur(18px);
+        pointer-events: none;
+    }
+
+    .hero-panel h3 {
+        position: relative;
+        margin: 0;
+        color: #ffffff;
+        font-size: 1.15rem;
+        font-weight: 800;
+    }
+
+    .hero-panel p {
+        position: relative;
+        max-width: 540px;
+        margin: 0.4rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.88rem;
+    }
+
+    .hero-metric {
+        position: relative;
+        min-width: 160px;
+        padding: 0.85rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.045);
+    }
+
+    .quick-panel {
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-radius: 16px;
+        padding: 1rem;
+    }
+
+    .quick-label,
+    .stats-label {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .quick-value {
+        color: #ffffff;
+        font-size: 1.45rem;
+        font-weight: 800;
+    }
+
+    .quick-icon,
+    .stats-icon {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+    }
+
+    .icon-blue { color: #7dd3fc; background: rgba(56, 189, 248, 0.13); }
+    .icon-green { color: #86efac; background: rgba(34, 197, 94, 0.13); }
+    .icon-rose { color: #fda4af; background: rgba(251, 113, 133, 0.13); }
+    .icon-violet { color: #c4b5fd; background: rgba(124, 58, 237, 0.16); }
+    .icon-amber { color: #fcd34d; background: rgba(245, 158, 11, 0.14); }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .stats-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-height: 116px;
+        border-radius: 16px;
+        padding: 1rem;
+    }
+
+    .stats-value {
+        max-width: 100%;
+        margin-top: 0.35rem;
+        color: #ffffff;
+        font-size: clamp(1.2rem, 1.8vw, 1.65rem);
+        font-weight: 800;
+        letter-spacing: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .stats-note {
+        margin-top: 0.35rem;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+    }
+
+    .analytics-card,
+    .admin-table-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .analytics-card {
+        padding: 1.1rem;
+        height: 100%;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .section-heading h5 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .section-heading p {
+        margin: 0.18rem 0 0;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+    }
+
+    .chart-frame {
+        position: relative;
+        height: 238px;
+    }
+
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem 1.1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .admin-table {
+        min-width: 760px;
+        margin-bottom: 0;
+        color: var(--text-main);
+    }
+
+    .admin-table thead th {
+        padding: 0.9rem 1.1rem;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.028);
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .admin-table tbody td {
+        padding: 0.95rem 1.1rem;
+        color: var(--text-main);
+        background: transparent;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .admin-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .admin-table tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .admin-thumb {
+        width: 46px;
+        height: 46px;
+        flex: 0 0 auto;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 1px solid var(--border-color);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .listing-title {
+        max-width: 260px;
+        color: #ffffff;
+        font-size: 0.9rem;
+        font-weight: 750;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .muted-chip,
+    .price-badge,
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        min-height: 28px;
+        border-radius: 999px;
+        padding: 0.25rem 0.65rem;
+        font-size: 0.78rem;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .muted-chip,
+    .price-badge {
+        color: #e2e8f0;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+    }
+
+    .status-badge.available {
+        color: #86efac;
+        background: rgba(34, 197, 94, 0.12);
+    }
+
+    .status-badge.sold {
+        color: #fda4af;
+        background: rgba(251, 113, 133, 0.12);
+    }
+
+    @media (max-width: 1200px) {
+        .insight-strip {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .hero-panel {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 820px) {
+        .dashboard-header,
+        .table-toolbar {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .header-actions {
+            justify-content: flex-start;
+        }
+
+        .insight-strip,
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-panel {
+            align-items: stretch;
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="dashboard-header">
+    <div>
+        <h1 class="dashboard-title">Dashboard</h1>
+        <p class="dashboard-subtitle">Track marketplace inventory, revenue, and listing health from one command view.</p>
+    </div>
+    <div class="header-actions">
+        <a href="/admin/admin-listings" class="ghost-btn">
+            <i class="bi bi-list-check"></i>
+            Listings
+        </a>
+        <a href="/admin/add-listing" class="primary-btn">
+            <i class="bi bi-plus-lg"></i>
+            Add Listing
+        </a>
+    </div>
+</header>
+
+<section class="insight-strip" aria-label="Dashboard summary">
+    <div class="hero-panel">
+        <div>
+            <h3>Operational Control Center</h3>
+            <p>Review current inventory coverage, sold-through performance, and margin movement before you make the next listing decision.</p>
+        </div>
+        <div class="hero-metric">
+            <div class="quick-label">Total Profit</div>
+            <div class="quick-value">${{ total_profit }}</div>
+            <div class="stats-note">Net marketplace position</div>
+        </div>
+    </div>
+    <div class="quick-panel">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+            <div class="quick-label">Available</div>
+            <div class="quick-icon icon-green"><i class="bi bi-check2-circle"></i></div>
+        </div>
+        <div>
+            <div class="quick-value">{{ available_listings }}</div>
+            <div class="stats-note">Ready for buyers</div>
+        </div>
+    </div>
+    <div class="quick-panel">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+            <div class="quick-label">Sold</div>
+            <div class="quick-icon icon-rose"><i class="bi bi-bag-check"></i></div>
+        </div>
+        <div>
+            <div class="quick-value">{{ sold_listings }}</div>
+            <div class="stats-note">Completed listings</div>
+        </div>
+    </div>
+    <div class="quick-panel">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+            <div class="quick-label">Catalog</div>
+            <div class="quick-icon icon-blue"><i class="bi bi-collection"></i></div>
+        </div>
+        <div>
+            <div class="quick-value">{{ total_listings }}</div>
+            <div class="stats-note">Total listing records</div>
+        </div>
+    </div>
+</section>
+
+<section class="stats-grid" aria-label="Financial metrics">
+    <div class="stats-card">
+        <div class="min-w-0">
+            <div class="stats-label">Total Spending</div>
+            <div class="stats-value">${{ total_spending }}</div>
+            <div class="stats-note">Acquisition cost</div>
+        </div>
+        <div class="stats-icon icon-violet"><i class="bi bi-wallet2"></i></div>
+    </div>
+    <div class="stats-card">
+        <div class="min-w-0">
+            <div class="stats-label">Total Revenue</div>
+            <div class="stats-value">${{ total_revenue }}</div>
+            <div class="stats-note">Gross sales value</div>
+        </div>
+        <div class="stats-icon icon-green"><i class="bi bi-graph-up-arrow"></i></div>
+    </div>
+    <div class="stats-card">
+        <div class="min-w-0">
+            <div class="stats-label">Profit Margin</div>
+            <div class="stats-value">${{ total_profit }}</div>
+            <div class="stats-note">Revenue after cost</div>
+        </div>
+        <div class="stats-icon icon-amber"><i class="bi bi-stars"></i></div>
+    </div>
+</section>
+
+<section class="row g-3 mb-3" aria-label="Analytics">
+    <div class="col-lg-7">
+        <div class="analytics-card">
+            <div class="section-heading">
+                <div>
+                    <h5>Sales Analytics</h5>
+                    <p>Spending, revenue, and profit comparison</p>
+                </div>
+                <span class="muted-chip"><i class="bi bi-bar-chart-line"></i>Live</span>
+            </div>
+            <div class="chart-frame">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="analytics-card">
+            <div class="section-heading">
+                <div>
+                    <h5>Daily Profit Trend</h5>
+                    <p>Net growth over active timeline</p>
+                </div>
+                <span class="muted-chip"><i class="bi bi-activity"></i>Trend</span>
+            </div>
+            <div class="chart-frame">
+                <canvas id="profitTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="admin-table-card">
+    <div class="table-toolbar">
+        <div>
+            <h5 class="text-white fw-bold mb-1" style="font-size: 1rem;">Recent Listings</h5>
+            <p class="text-secondary small mb-0">Latest marketplace records</p>
+        </div>
+        <a href="/admin/admin-listings" class="ghost-btn">
+            <i class="bi bi-arrow-right"></i>
+            View All
+        </a>
+    </div>
+    <div class="table-responsive">
+        <table class="table admin-table align-middle">
+            <thead>
+                <tr>
+                    <th>Listing</th>
+                    <th>Game</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for listing in recent_listings %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" class="admin-thumb" alt="">
+                                <div class="min-w-0">
+                                    <div class="listing-title">{{ listing.title }}</div>
+                                    <span class="text-secondary font-monospace" style="font-size: 0.72rem;">ID: #{{ listing.id }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="muted-chip">{{ listing.game.name }}</span>
+                        </td>
+                        <td>
+                            <span class="price-badge">${{ listing.price }}</span>
+                        </td>
+                        <td>
+                            {% if listing.status == "available" %}
+                                <span class="status-badge available">
+                                    <span class="status-dot" style="background:#22c55e;"></span>Available
+                                </span>
+                            {% else %}
+                                <span class="status-badge sold">
+                                    <span class="status-dot" style="background:#fb7185;"></span>Sold
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const gridConfig = { color: "rgba(148, 163, 184, 0.1)", drawBorder: false };
+    const tickConfig = { color: "#8b95a5", font: { family: "Inter", size: 10 } };
+
+    const salesCanvas = document.getElementById("salesChart");
+    const profitCanvas = document.getElementById("profitTrendChart");
+
+    if (salesCanvas && window.Chart) {
+        const ctx = salesCanvas.getContext("2d");
+        const barGradient = ctx.createLinearGradient(0, 0, 0, 240);
+        barGradient.addColorStop(0, "rgba(56, 189, 248, 0.9)");
+        barGradient.addColorStop(0.55, "rgba(124, 58, 237, 0.58)");
+        barGradient.addColorStop(1, "rgba(124, 58, 237, 0.14)");
+
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Spending", "Revenue", "Profit"],
+                datasets: [{
+                    data: [{{ total_spending }}, {{ total_revenue }}, {{ total_profit }}],
+                    backgroundColor: barGradient,
+                    hoverBackgroundColor: "rgba(56, 189, 248, 0.95)",
+                    borderWidth: 0,
+                    borderRadius: 8,
+                    barThickness: 32
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: "#0f172a",
+                        borderColor: "rgba(148, 163, 184, 0.22)",
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: { grid: gridConfig, ticks: tickConfig },
+                    x: { grid: { display: false }, ticks: tickConfig }
+                }
+            }
+        });
+    }
+
+    if (profitCanvas && window.Chart) {
+        const profitCtx = profitCanvas.getContext("2d");
+        const lineGradient = profitCtx.createLinearGradient(0, 0, 0, 240);
+        lineGradient.addColorStop(0, "rgba(34, 197, 94, 0.28)");
+        lineGradient.addColorStop(1, "rgba(34, 197, 94, 0)");
+
+        new Chart(profitCtx, {
+            type: "line",
+            data: {
+                labels: {{ profit_labels|tojson }},
+                datasets: [{
+                    data: {{ profit_values|tojson }},
+                    borderColor: "#22c55e",
+                    borderWidth: 2,
+                    pointBackgroundColor: "#ffffff",
+                    pointBorderColor: "#22c55e",
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    tension: 0.38,
+                    fill: true,
+                    backgroundColor: lineGradient
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: "#0f172a",
+                        borderColor: "rgba(148, 163, 184, 0.22)",
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: { grid: gridConfig, ticks: tickConfig },
+                    x: { grid: { display: false }, ticks: tickConfig }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

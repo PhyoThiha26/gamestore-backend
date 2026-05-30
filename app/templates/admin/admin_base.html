@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Nexus Admin{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #080b12;
+            --bg-panel: #101623;
+            --bg-panel-soft: #151c2b;
+            --bg-sidebar: #0d121d;
+            --accent-primary: #7c3aed;
+            --accent-blue: #38bdf8;
+            --accent-success: #22c55e;
+            --accent-danger: #fb7185;
+            --accent-warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #9aa4b2;
+            --text-soft: #cbd5e1;
+            --border-color: rgba(148, 163, 184, 0.16);
+            --shadow-panel: 0 18px 45px rgba(0, 0, 0, 0.28);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body.admin-body {
+            min-height: 100vh;
+            margin: 0;
+            background:
+                radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 28rem),
+                radial-gradient(circle at bottom right, rgba(124, 58, 237, 0.13), transparent 26rem),
+                var(--bg-main);
+            color: var(--text-main);
+            font-family: "Inter", sans-serif;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            position: fixed;
+            inset: 0 auto 0 0;
+            z-index: 100;
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(13, 18, 29, 0.88);
+            border-right: 1px solid var(--border-color);
+            backdrop-filter: blur(18px);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            min-height: 44px;
+            color: var(--text-main);
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #7c3aed, #38bdf8);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.18);
+        }
+
+        .sidebar-kicker {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            display: grid;
+            gap: 0.35rem;
+        }
+
+        .admin-sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            min-height: 44px;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.75rem 0.85rem;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            font-weight: 650;
+            transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+        }
+
+        .admin-sidebar a i {
+            font-size: 1.05rem;
+        }
+
+        .admin-sidebar a:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.045);
+            border-color: var(--border-color);
+        }
+
+        .admin-sidebar a.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.92), rgba(56, 189, 248, 0.58));
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+        }
+
+        .sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .profile-avatar {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: 10px;
+            background: rgba(34, 197, 94, 0.16);
+            color: #86efac;
+        }
+
+        .admin-content {
+            flex: 1;
+            min-width: 0;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .content-shell {
+            width: min(100%, 1380px);
+            margin: 0 auto;
+        }
+
+        .filter-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: var(--shadow-panel);
+        }
+
+        .filter-btn {
+            min-height: 44px;
+            border: 0;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #0f172a;
+            font-weight: 800;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(255, 255, 255, 0.08);
+        }
+
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                width: 86px;
+                padding: 1rem 0.8rem;
+                align-items: center;
+            }
+
+            .sidebar-brand {
+                justify-content: center;
+            }
+
+            .sidebar-brand div:not(.brand-mark),
+            .admin-sidebar a span,
+            .sidebar-profile div:not(.profile-avatar) {
+                display: none;
+            }
+
+            .sidebar-nav,
+            .sidebar-footer {
+                width: 100%;
+            }
+
+            .admin-sidebar a {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+
+            .sidebar-profile {
+                justify-content: center;
+                padding: 0.65rem;
+            }
+
+            .admin-content {
+                margin-left: 86px;
+                padding: 1.25rem;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .admin-layout {
+                display: block;
+                padding-bottom: 72px;
+            }
+
+            .admin-sidebar {
+                top: auto;
+                right: 0;
+                width: 100%;
+                height: 72px;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.35rem;
+                padding: 0.55rem;
+                border-top: 1px solid var(--border-color);
+                border-right: 0;
+            }
+
+            .sidebar-brand,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .sidebar-nav {
+                display: contents;
+            }
+
+            .admin-sidebar a {
+                min-height: 54px;
+                margin: 0;
+                font-size: 0.72rem;
+                flex-direction: column;
+                gap: 0.25rem;
+                border-radius: 12px;
+            }
+
+            .admin-sidebar a span {
+                display: block;
+            }
+
+            .admin-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <aside class="admin-sidebar" aria-label="Admin navigation">
+            <div class="sidebar-brand">
+                <div class="brand-mark"><i class="bi bi-shield-lock-fill"></i></div>
+                <div>
+                    <span>Nexus Admin</span>
+                    <span class="sidebar-kicker">Marketplace Ops</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+      
+                <a href="/admin/dashboard" class="{% if request.endpoint == 'admin_dashboard' or request.path == '/admin/dashboard' %}active{% endif %}" {% if request.endpoint == 'admin_dashboard' or request.path == '/admin/dashboard' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-grid-1x2-fill"></i>Dashboard
+                </a>
+               
+                <a href="/admin/admin-listings" class="{% if request.path == '/admin/admin-listings' %}active{% endif %}" {% if request.path == '/admin/admin-listings' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-tags-fill"></i>Manage Listings
+                </a>
+             
+                <a href="/admin/add-listing" class="{% if request.path == '/admin/add-listing' %}active{% endif %}" {% if request.path == '/admin/add-listing' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-plus-circle-fill"></i>Add Listing
+                </a>
+               
+                <a href="/admin/profile" class="{% if request.path == '/admin/profile' %}active{% endif %}" {% if request.path == '/admin/profile' %}aria-current="page"{% endif %}>
+                    <i class="bi bi-person-fill"></i>Profile
+                </a>
+            </nav>
+
+            <div class="sidebar-footer w-100">
+                <div class="sidebar-profile">
+                    <div class="profile-avatar"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <div class="min-w-0">
+                        <div class="text-white fw-bold small">Admin Console</div>
+                        <div class="text-secondary" style="font-size: 0.74rem;">Live controls</div>
+                    </div>
+                </div>
+                <a href="/logout" class="text-danger">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <div class="content-shell">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

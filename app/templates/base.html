@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Marnay Game Store{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        :root {
+            --store-bg: #080b12;
+            --store-panel: #101623;
+            --store-panel-soft: #151c2b;
+            --store-border: rgba(148, 163, 184, 0.16);
+            --store-text: #f8fafc;
+            --store-muted: #9aa4b2;
+            --store-soft: #cbd5e1;
+            --store-purple: #7c3aed;
+            --store-blue: #38bdf8;
+            --store-green: #22c55e;
+            --store-shadow: 0 22px 60px rgba(0, 0, 0, 0.32);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            color: var(--store-text);
+            font-family: "Inter", sans-serif;
+            background:
+                radial-gradient(circle at 14% 6%, rgba(56, 189, 248, 0.15), transparent 28rem),
+                radial-gradient(circle at 86% 20%, rgba(124, 58, 237, 0.14), transparent 28rem),
+                var(--store-bg);
+        }
+
+        .container {
+            max-width: 1240px;
+        }
+
+        .store-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            padding: 0.9rem 0;
+            background: rgba(8, 11, 18, 0.86);
+            border-bottom: 1px solid var(--store-border);
+            backdrop-filter: blur(18px);
+        }
+
+        .store-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            color: #ffffff !important;
+            font-size: 1rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .brand-mark {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--store-purple), var(--store-blue));
+            box-shadow: 0 12px 28px rgba(56, 189, 248, 0.16);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .store-btn {
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            border-radius: 10px;
+            padding: 0.55rem 0.85rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-decoration: none;
+            border: 1px solid var(--store-border);
+        }
+
+        .store-btn.ghost {
+            color: var(--store-soft);
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        .store-btn.primary {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.16);
+            background: linear-gradient(135deg, var(--store-purple), #2563eb);
+            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.16);
+        }
+
+        .store-btn:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.24);
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .store-alert {
+            color: var(--store-text);
+            background: rgba(255, 255, 255, 0.055);
+            border: 1px solid var(--store-border);
+            border-radius: 12px;
+        }
+
+        .store-footer {
+            margin-top: 4rem;
+            padding: 1.4rem 0;
+            color: var(--store-muted);
+            background: rgba(3, 7, 18, 0.5);
+            border-top: 1px solid var(--store-border);
+            font-size: 0.86rem;
+        }
+
+        @media (max-width: 560px) {
+            .store-navbar .container {
+                gap: 0.85rem;
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .store-brand {
+                justify-content: center;
+            }
+
+            .nav-actions {
+                justify-content: center;
+            }
+
+            .store-btn {
+                flex: 1;
+            }
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar store-navbar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a class="store-brand" href="/">
+                <span class="brand-mark"><i class="bi bi-controller"></i></span>
+                <span>Marnay Game Store</span>
+            </a>
+
+            <div class="nav-actions">
+                {% if session.get("role") == "admin" %}
+                    <a class="store-btn primary" href="/admin/dashboard">
+                        <i class="bi bi-grid-1x2"></i>
+                        Dashboard
+                    </a>
+                {% endif %}
+                <a class="store-btn ghost" href="/login">
+                    <i class="bi bi-shield-lock"></i>
+                    Admin
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container py-4 py-lg-5">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert store-alert mb-4">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="store-footer">
+        <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <span>Marnay Game Store</span>
+            <span>Premium gaming marketplace</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

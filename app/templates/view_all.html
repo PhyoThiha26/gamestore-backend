@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+
+{% block title %}All Listings - Marnay Game Store{% endblock %}
+
+{% block head %}
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 1.1rem;
+        border: 1px solid var(--store-border);
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(21, 28, 43, 0.9), rgba(16, 22, 35, 0.96));
+        box-shadow: var(--store-shadow);
+    }
+
+    .page-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: clamp(1.65rem, 4vw, 2.4rem);
+        font-weight: 800;
+        letter-spacing: 0;
+    }
+
+    .page-subtitle {
+        margin: 0.35rem 0 0;
+        color: var(--store-muted);
+        font-size: 0.94rem;
+    }
+
+    .back-btn,
+    .filter-btn,
+    .view-btn {
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 0.86rem;
+        font-weight: 800;
+    }
+
+    .back-btn {
+        flex: 0 0 auto;
+        padding: 0.55rem 0.85rem;
+        color: var(--store-soft);
+        border: 1px solid var(--store-border);
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .filter-panel {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border: 1px solid var(--store-border);
+        border-radius: 16px;
+        background: rgba(16, 22, 35, 0.72);
+        box-shadow: var(--store-shadow);
+    }
+
+    .filter-label {
+        display: block;
+        margin-bottom: 0.4rem;
+        color: var(--store-muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .store-input {
+        min-height: 42px;
+        color: var(--store-text) !important;
+        background: rgba(3, 7, 18, 0.42) !important;
+        border: 1px solid var(--store-border) !important;
+        border-radius: 10px !important;
+        box-shadow: none !important;
+    }
+
+    .store-input:focus {
+        border-color: rgba(56, 189, 248, 0.72) !important;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12) !important;
+    }
+
+    .store-input::placeholder {
+        color: rgba(203, 213, 225, 0.42);
+    }
+
+    select.store-input option {
+        color: var(--store-text);
+        background: #111827;
+    }
+
+    .filter-btn {
+        width: 100%;
+        padding: 0.55rem 0.85rem;
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: linear-gradient(135deg, var(--store-purple), #2563eb);
+    }
+
+    .listing-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .market-card {
+        min-width: 0;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid var(--store-border);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(21, 28, 43, 0.95), rgba(15, 23, 42, 0.98));
+        box-shadow: var(--store-shadow);
+        transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .market-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(56, 189, 248, 0.34);
+    }
+
+    .listing-image-wrap {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 16 / 10;
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .listing-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.28s ease;
+    }
+
+    .market-card:hover .listing-image {
+        transform: scale(1.035);
+    }
+
+    .listing-tag {
+        position: absolute;
+        left: 0.75rem;
+        top: 0.75rem;
+        min-height: 26px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        color: #ffffff;
+        background: rgba(8, 11, 18, 0.75);
+        backdrop-filter: blur(10px);
+        font-size: 0.72rem;
+        font-weight: 800;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .listing-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.35;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .listing-game {
+        margin: 0.35rem 0 0;
+        color: var(--store-muted);
+        font-size: 0.84rem;
+    }
+
+    .listing-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
+        padding-top: 0.85rem;
+        margin-top: 0.85rem;
+        border-top: 1px solid var(--store-border);
+    }
+
+    .listing-price {
+        color: #ffffff;
+        font-size: 1.35rem;
+        font-weight: 800;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        min-height: 28px;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        color: #86efac;
+        background: rgba(34, 197, 94, 0.12);
+        font-size: 0.74rem;
+        font-weight: 800;
+    }
+
+    .seller-row {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin-top: 0.9rem;
+    }
+
+    .seller-avatar {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 auto;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 1px solid var(--store-border);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .seller-name {
+        color: var(--store-soft);
+        font-size: 0.82rem;
+        font-weight: 800;
+    }
+
+    .seller-role {
+        color: var(--store-muted);
+        font-size: 0.74rem;
+    }
+
+    .view-btn {
+        width: 100%;
+        margin-top: 1rem;
+        color: #ffffff;
+        background: linear-gradient(135deg, var(--store-purple), #2563eb);
+    }
+
+    .empty-box {
+        padding: 1rem;
+        border: 1px solid var(--store-border);
+        border-radius: 14px;
+        color: var(--store-muted);
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    .pagination-wrap {
+        display: flex;
+        justify-content: center;
+        margin-top: 1.25rem;
+    }
+
+    .premium-page {
+        min-width: 38px;
+        min-height: 38px;
+        display: grid;
+        place-items: center;
+        color: var(--store-muted) !important;
+        background: rgba(21, 28, 43, 0.92) !important;
+        border: 1px solid var(--store-border) !important;
+        border-radius: 10px !important;
+        font-size: 0.86rem;
+        font-weight: 800;
+    }
+
+    .premium-page:hover,
+    .page-item.active .premium-page {
+        color: #ffffff !important;
+        background: var(--store-purple) !important;
+        border-color: var(--store-purple) !important;
+    }
+
+    @media (max-width: 992px) {
+        .listing-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 640px) {
+        .page-header {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .back-btn {
+            width: 100%;
+        }
+
+        .listing-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1 class="page-title">{{ page_title or "All Listings" }}</h1>
+        <p class="page-subtitle">{{ page_subtitle or "Browse every available premium game account in the store." }}</p>
+    </div>
+    <a href="/" class="back-btn">
+        <i class="bi bi-arrow-left"></i>
+        Home
+    </a>
+</header>
+
+<section class="filter-panel" aria-label="Listing filters">
+    <form method="GET" class="row g-3 align-items-end">
+        <div class="col-lg-7">
+            <label class="filter-label" for="search">Search</label>
+            <input id="search" type="text" name="search" class="form-control store-input" placeholder="Search accounts..." value="{{ request.args.get('search', '') }}">
+        </div>
+        <div class="col-lg-3">
+            <label class="filter-label" for="game_id">Game</label>
+            <select id="game_id" name="game_id" class="form-select store-input">
+                <option value="">All Games</option>
+                {% for game in games %}
+                    <option value="{{ game.id }}" {% if request.args.get('game_id') == game.id|string %}selected{% endif %}>{{ game.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-2">
+            <button type="submit" class="filter-btn">
+                <i class="bi bi-funnel"></i>
+                Filter
+            </button>
+        </div>
+    </form>
+</section>
+
+{% if listings|length %}
+    <section class="listing-grid" aria-label="All listings">
+        {% for listing in listings %}
+            <article class="market-card">
+                <div class="listing-image-wrap">
+                    <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" class="listing-image" alt="{{ listing.title }}">
+                    <span class="listing-tag"><i class="bi bi-controller"></i>{{ listing.game.name }}</span>
+                </div>
+                <div class="card-body">
+                    <h2 class="listing-title">{{ listing.title }}</h2>
+                    <p class="listing-game">{{ listing.game.name }}</p>
+
+                    <div class="listing-meta">
+                        <div class="listing-price">{{ listing.price }}</div>
+                        {% if listing.featured %}
+                            <span class="status-pill"><i class="bi bi-check2-circle"></i>For Rental</span>
+
+                        {% else %}
+                            <span class="status-pill"><i class="bi bi-check2-circle"></i>For Sale</span>
+
+                        {% endif %}
+                    </div>
+
+                    <div class="seller-row">
+                        <img src="{{ url_for('static', filename='uploads/' + (listing.seller.profile_image or 'default.jpg')) }}" class="seller-avatar" alt="{{ listing.seller.username }}">
+                        <div>
+                            <div class="seller-name">{{ listing.seller.username }}</div>
+                            <div class="seller-role">Verified Seller</div>
+                        </div>
+                    </div>
+
+                    <a href="/listing/{{ listing.id }}" class="view-btn">
+                        View Details
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </article>
+        {% endfor %}
+    </section>
+{% else %}
+    <div class="empty-box">No listings found.</div>
+{% endif %}
+
+{% if pagination %}
+    <nav class="pagination-wrap" aria-label="Listing pagination">
+        <ul class="pagination gap-1 mb-0">
+            {% if pagination.has_prev %}
+                <li class="page-item">
+                    <a class="page-link premium-page" href="?page={{ pagination.prev_num }}{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}{% if request.args.get('game_id') %}&game_id={{ request.args.get('game_id') }}{% endif %}" aria-label="Previous page">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page_num in pagination.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                        <a class="page-link premium-page" href="?page={{ page_num }}{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}{% if request.args.get('game_id') %}&game_id={{ request.args.get('game_id') }}{% endif %}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link premium-page">...</span></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagination.has_next %}
+                <li class="page-item">
+                    <a class="page-link premium-page" href="?page={{ pagination.next_num }}{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}{% if request.args.get('game_id') %}&game_id={{ request.args.get('game_id') }}{% endif %}" aria-label="Next page">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+{% endblock %}

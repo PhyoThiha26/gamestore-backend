@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Nexus Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #080b12;
+            --bg-panel: #101623;
+            --accent-primary: #7c3aed;
+            --accent-blue: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #9aa4b2;
+            --text-soft: #cbd5e1;
+            --border-color: rgba(148, 163, 184, 0.16);
+            --shadow-panel: 0 24px 70px rgba(0, 0, 0, 0.38);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 1.25rem;
+            color: var(--text-main);
+            font-family: "Inter", sans-serif;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(56, 189, 248, 0.16), transparent 26rem),
+                radial-gradient(circle at 85% 90%, rgba(124, 58, 237, 0.16), transparent 28rem),
+                var(--bg-main);
+        }
+
+        .auth-shell {
+            width: min(100%, 440px);
+        }
+
+        .auth-card {
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(21, 28, 43, 0.94), rgba(16, 22, 35, 0.98));
+            box-shadow: var(--shadow-panel);
+        }
+
+        .auth-card-top {
+            padding: 1.25rem 1.25rem 0;
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-mark {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: 12px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #7c3aed, #38bdf8);
+            box-shadow: 0 12px 28px rgba(56, 189, 248, 0.18);
+        }
+
+        .brand-name {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .brand-kicker {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .auth-body {
+            padding: 1.6rem 1.25rem 1.25rem;
+        }
+
+        .auth-title {
+            margin: 0;
+            color: #ffffff;
+            font-size: clamp(1.65rem, 6vw, 2.05rem);
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .auth-subtitle {
+            margin: 0.45rem 0 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.45rem;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .input-wrap {
+            display: flex;
+            align-items: center;
+            min-height: 46px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: rgba(3, 7, 18, 0.42);
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .input-wrap:focus-within {
+            border-color: rgba(56, 189, 248, 0.72);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+        }
+
+        .input-icon {
+            width: 46px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            color: var(--text-muted);
+        }
+
+        .auth-input {
+            width: 100%;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            color: var(--text-main);
+            background: transparent;
+            padding: 0.75rem 0.9rem 0.75rem 0;
+            font-size: 0.95rem;
+        }
+
+        .auth-input::placeholder {
+            color: rgba(203, 213, 225, 0.42);
+        }
+
+        .login-submit-btn {
+            min-height: 46px;
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.4rem;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 10px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #7c3aed, #2563eb);
+            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.2);
+            font-weight: 800;
+            transition: transform 0.18s ease, filter 0.18s ease;
+        }
+
+        .login-submit-btn:hover {
+            filter: brightness(1.06);
+        }
+
+        .login-submit-btn:active {
+            transform: translateY(1px);
+        }
+
+        .auth-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 1rem 1.25rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.025);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 420px) {
+            body {
+                padding: 0.85rem;
+            }
+
+            .auth-body,
+            .auth-card-top,
+            .auth-footer {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="auth-shell">
+        <section class="auth-card" aria-label="Admin login">
+            <div class="auth-card-top">
+                <div class="brand-row">
+                    <div class="brand-mark"><i class="bi bi-shield-lock-fill"></i></div>
+                    <div>
+                        <h1 class="brand-name">Nexus Admin</h1>
+                        <span class="brand-kicker">Marketplace Ops</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-body">
+                <h2 class="auth-title">Welcome Back</h2>
+                <p class="auth-subtitle">Sign in to manage listings, sales, and seller profile settings.</p>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label" for="username">Username</label>
+                        <div class="input-wrap">
+                            <span class="input-icon"><i class="bi bi-person"></i></span>
+                            <input id="username" type="text" name="username" class="auth-input" placeholder="Enter username" autocomplete="username" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="input-wrap">
+                            <span class="input-icon"><i class="bi bi-key"></i></span>
+                            <input id="password" type="password" name="password" class="auth-input" placeholder="Enter password" autocomplete="current-password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-submit-btn">
+                        Sign In
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="auth-footer">
+                <i class="bi bi-lock"></i>
+                Authorized access only
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

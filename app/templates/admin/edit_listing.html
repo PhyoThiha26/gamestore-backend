@@ -1,0 +1,230 @@
+{% extends "admin/admin_base.html" %}
+
+{% block content %}
+<style>
+    /* Page Specific Layout Utilities */
+    .dashboard-title {
+        font-weight: 700;
+        letter-spacing: -1px;
+    }
+
+    /* Core Form Card Design Architecture */
+    .admin-form-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Form Section Labels Styling */
+    .form-label {
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Premium Dark Theme Custom Inputs Framework */
+    .admin-input {
+        background-color: rgba(0, 0, 0, 0.2) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-main) !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.95rem;
+        transition: all 0.2s ease !important;
+    }
+    .admin-input:focus {
+        border-color: var(--accent-primary) !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+    }
+    select.admin-input option {
+        background-color: #111625;
+        color: var(--text-main);
+    }
+
+    /* Media Side Panel Display Box Layout */
+    .media-card {
+        background-color: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+    .media-card-title {
+        color: var(--text-main);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    .media-card-subtitle {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        margin-bottom: 1.25rem;
+    }
+
+    /* Asset Image Preview Framework Elements */
+    .edit-preview {
+        width: 100%;
+        max-height: 180px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        transition: opacity 0.2s ease;
+    }
+    .edit-preview:hover {
+        opacity: 0.85;
+    }
+
+    /* Update Modification Trigger Button Control */
+    .update-btn {
+        background: var(--accent-primary);
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        padding: 0.85rem 2.5rem;
+        border-radius: 10px;
+        transition: opacity 0.2s ease;
+    }
+    .update-btn:hover {
+        opacity: 0.9;
+    }
+
+    /* Full-Screen Zoom Media System Modal Setup */
+    .preview-modal-content {
+        background: transparent !important;
+        border: none !important;
+    }
+    .full-preview-image {
+        width: 100%;
+        max-height: 85vh;
+        object-fit: contain;
+        border-radius: 12px;
+    }
+</style>
+
+<div class="edit-listing-page">
+    <div class="mb-4">
+        <h2 class="dashboard-title text-white mb-1">Edit Listing</h2>
+        <p class="text-secondary small mb-0">Modify and update marketplace parameters for this live game asset</p>
+    </div>
+
+    <div class="admin-form-card">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row g-4">
+                
+                <div class="col-lg-8">
+                    <div class="mb-4">
+                        <label class="form-label">Listing Title</label>
+                        <input type="text" name="title" class="form-control admin-input" value="{{ listing.title }}" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" rows="6" class="form-control admin-input" required>{{ listing.description }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label">Selling Price ($)</label>
+                                <input  step="0.01" name="price" class="form-control admin-input" value="{{ listing.price }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label">Target Game</label>
+                                <select name="game_id" class="form-select admin-input" required>
+                                    {% for game in games %}
+                                        <option value="{{ game.id }}" {% if game.id == listing.game_id %}selected{% endif %}>
+                                            {{ game.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-0">
+                                <label class="form-label">Market Status</label>
+                                <select name="status" class="form-select admin-input" required>
+                                    <option value="available" {% if listing.status == "available" %}selected{% endif %}>Available</option>
+                                    <option value="sold" {% if listing.status == "sold" %}selected{% endif %}>Sold</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="media-card d-flex flex-column h-100 justify-content-between">
+                        <div>
+                            <h5 class="media-card-title">Listing Thumbnail</h5>
+                            <p class="media-card-subtitle">Active visual representation preview</p>
+                            
+                            <div class="text-center mb-4">
+                                <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" 
+                                     class="edit-preview" 
+                                     id="livePreviewContainer"
+                                     data-bs-toggle="modal" 
+                                     data-bs-target="#imageModal"
+                                     alt="Current Cover Graphic Source">
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label">Replace Image Option</label>
+                            <input type="file" name="image" class="form-control admin-input" id="replaceImageInput" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-4 pt-3 border-top border-secondary border-opacity-10 text-end">
+                <button type="submit" class="update-btn shadow-sm">
+                    Update Listing Specifications
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content preview-modal-content">
+            <div class="modal-body p-0 text-center">
+                <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" 
+                     class="full-preview-image" 
+                     id="modalImageReference"
+                     alt="Full Resolution View Asset">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const replaceImageInput = document.getElementById("replaceImageInput");
+    const livePreviewContainer = document.getElementById("livePreviewContainer");
+    const modalImageReference = document.getElementById("modalImageReference");
+
+    replaceImageInput.addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const runtimeObjectUrl = URL.createObjectURL(file);
+            
+            // Sync both the card block snapshot thumbnail and the inside zoom view container tracking
+            livePreviewContainer.src = runtimeObjectUrl;
+            modalImageReference.src = runtimeObjectUrl;
+        }
+    });
+});
+</script>
+{% endblock %}

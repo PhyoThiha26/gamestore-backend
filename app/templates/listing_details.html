@@ -1,0 +1,970 @@
+{% extends "base.html" %}
+
+{% block title %}{{ listing.title }} - Marnay Game Store{% endblock %}
+
+{% block head %}
+<style>
+    .detail-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .crumb-link {
+        min-height: 38px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: var(--store-soft);
+        text-decoration: none;
+        border: 1px solid var(--store-border);
+        border-radius: 10px;
+        padding: 0.5rem 0.75rem;
+        background: rgba(255, 255, 255, 0.035);
+        font-size: 0.84rem;
+        font-weight: 800;
+    }
+
+    .detail-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.28fr) minmax(360px, 0.82fr);
+        gap: 1rem;
+        align-items: start;
+    }
+
+    .gallery-panel,
+    .detail-panel,
+    .summary-strip {
+        border: 1px solid var(--store-border);
+        background: linear-gradient(180deg, rgba(21, 28, 43, 0.94), rgba(16, 22, 35, 0.98));
+        box-shadow: var(--store-shadow);
+    }
+
+    .gallery-panel {
+        overflow: hidden;
+        border-radius: 18px;
+        padding: 1rem;
+    }
+
+    .gallery-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .gallery-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 800;
+    }
+
+    .gallery-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: var(--store-muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+    }
+
+    .carousel-frame {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--store-border);
+        border-radius: 16px;
+        background: #05070d;
+    }
+
+    .detail-main-image {
+        width: 100%;
+        height: min(66vh, 660px);
+        min-height: 440px;
+        object-fit: contain;
+        display: block;
+        cursor: zoom-in;
+        background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.035), transparent),
+            #05070d;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 54px;
+    }
+
+    .custom-control {
+        width: 42px;
+        height: 42px;
+        top: 50%;
+        margin: 0 0.85rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        background: rgba(8, 11, 18, 0.72);
+        backdrop-filter: blur(10px);
+        transform: translateY(-50%);
+    }
+
+    .thumbnail-row {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 114px;
+        gap: 0.75rem;
+        overflow-x: auto;
+        padding-top: 0.9rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(148, 163, 184, 0.38) transparent;
+    }
+
+    .thumbnail-image {
+        width: 114px;
+        height: 78px;
+        object-fit: cover;
+        border: 2px solid transparent;
+        border-radius: 12px;
+        opacity: 0.62;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.05);
+        transition: opacity 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+    }
+
+    .thumbnail-image:hover,
+    .thumbnail-image.active-thumb {
+        opacity: 1;
+        border-color: var(--store-blue);
+    }
+
+    .thumbnail-image:hover {
+        transform: translateY(-1px);
+    }
+
+    .summary-strip {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+        padding: 0.85rem;
+        border-radius: 16px;
+    }
+
+    .summary-item {
+        padding: 0.8rem;
+        border: 1px solid var(--store-border);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    .summary-label {
+        color: var(--store-muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .summary-value {
+        margin-top: 0.28rem;
+        color: #ffffff;
+        font-size: 0.92rem;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .sticky-panel {
+        position: sticky;
+        top: 96px;
+    }
+
+    .detail-panel {
+        overflow: hidden;
+        border-radius: 18px;
+    }
+
+    .detail-body {
+        padding: 1.2rem;
+    }
+
+    .badge-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+    }
+
+    .game-badge,
+    .status-pill {
+        min-height: 30px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.42rem;
+        border-radius: 999px;
+        padding: 0.28rem 0.7rem;
+        font-size: 0.76rem;
+        font-weight: 800;
+    }
+
+    .game-badge {
+        color: #bae6fd;
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .status-pill {
+        color: #86efac;
+        background: rgba(34, 197, 94, 0.12);
+    }
+
+    .detail-title {
+        margin: 1rem 0 0;
+        color: #ffffff;
+        font-size: clamp(1.75rem, 3vw, 2.65rem);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: 0;
+    }
+
+    .price-box {
+        display: flex;
+        align-items: baseline;
+        gap: 0.45rem;
+        margin-top: 1rem;
+        color: #ffffff;
+        font-size: clamp(1.95rem, 4vw, 2.55rem);
+        font-weight: 800;
+    }
+
+    .price-box span {
+        color: var(--store-muted);
+        font-size: 0.82rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .info-box {
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid var(--store-border);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    .section-title {
+        margin: 0 0 0.7rem;
+        color: var(--store-muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .description-text {
+        margin: 0;
+        color: var(--store-soft);
+        line-height: 1.75;
+        white-space: pre-line;
+    }
+
+    .seller-card {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .seller-avatar {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 auto;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 1px solid var(--store-border);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .seller-name {
+        color: #ffffff;
+        font-weight: 800;
+    }
+
+    .seller-role {
+        color: var(--store-muted);
+        font-size: 0.82rem;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.7rem;
+    }
+
+    .contact-btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border: 1px solid var(--store-border);
+        border-radius: 10px;
+        color: var(--store-soft);
+        background: rgba(255, 255, 255, 0.04);
+        text-decoration: none;
+        font-size: 0.86rem;
+        font-weight: 800;
+    }
+
+    .contact-btn.primary {
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.16);
+        background: linear-gradient(135deg, var(--store-purple), #2563eb);
+        box-shadow: 0 14px 28px rgba(37, 99, 235, 0.16);
+    }
+
+    .contact-btn:hover,
+    .crumb-link:hover {
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    .trust-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.55rem;
+        padding: 0.9rem 1.2rem 1.2rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-top: 1px solid var(--store-border);
+    }
+
+    .trust-item {
+        display: grid;
+        place-items: center;
+        gap: 0.35rem;
+        min-height: 78px;
+        text-align: center;
+        border: 1px solid var(--store-border);
+        border-radius: 12px;
+        color: var(--store-muted);
+        background: rgba(255, 255, 255, 0.03);
+        font-size: 0.72rem;
+        font-weight: 800;
+    }
+
+    .trust-item i {
+        color: var(--store-blue);
+        font-size: 1.05rem;
+    }
+
+    .gallery-modal-content {
+        background: #000000;
+        border: 0;
+    }
+
+    .fullscreen-image {
+        width: 100%;
+        height: 100vh;
+        object-fit: contain;
+        background: #000000;
+    }
+
+    .modal-close-btn {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1060;
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 999px;
+        color: #ffffff;
+        background: rgba(8, 11, 18, 0.72);
+    }
+
+    @media (max-width: 1080px) {
+        .detail-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .sticky-panel {
+            position: static;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .detail-topbar,
+        .gallery-heading {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .crumb-link {
+            justify-content: center;
+            width: 100%;
+        }
+
+        .summary-strip,
+        .trust-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .gallery-panel,
+        .detail-panel {
+            border-radius: 14px;
+        }
+
+        .detail-main-image {
+            min-height: 320px;
+            height: 420px;
+        }
+
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-topbar">
+    <a href="/view-all/{{listing.game_id}}" class="crumb-link">
+        <i class="bi bi-arrow-left"></i>
+        Back
+    </a>
+  
+</div>
+
+<div class="detail-layout">
+    <div>
+        <section class="gallery-panel" aria-label="Listing gallery">
+            <div class="gallery-heading">
+                <h2 class="gallery-title">Account Gallery</h2>
+                <span class="gallery-count">
+                    <i class="bi bi-images"></i>
+                    {{ listing.images|length + 1 }} images
+                </span>
+            </div>
+
+            <div id="listingCarousel" class="carousel slide">
+                <div class="carousel-inner carousel-frame">
+                    <div class="carousel-item active">
+                        <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" class="detail-main-image" alt="{{ listing.title }}" data-bs-toggle="modal" data-bs-target="#galleryModal">
+                    </div>
+
+                    {% for image in listing.images %}
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='uploads/' + image.image) }}" class="detail-main-image" alt="{{ listing.title }} screenshot {{ loop.index }}" data-bs-toggle="modal" data-bs-target="#galleryModal">
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if listing.images|length %}
+                    <button class="carousel-control-prev custom-control" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev" aria-label="Previous image">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next custom-control" type="button" data-bs-target="#listingCarousel" data-bs-slide="next" aria-label="Next image">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                {% endif %}
+            </div>
+
+            <div class="thumbnail-row" aria-label="Gallery thumbnails">
+                <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" class="thumbnail-image active-thumb" alt="{{ listing.title }} thumbnail" data-bs-target="#listingCarousel" data-bs-slide-to="0">
+
+                {% for image in listing.images %}
+                    <img src="{{ url_for('static', filename='uploads/' + image.image) }}" class="thumbnail-image" alt="{{ listing.title }} thumbnail {{ loop.index }}" data-bs-target="#listingCarousel" data-bs-slide-to="{{ loop.index }}">
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="summary-strip" aria-label="Listing summary">
+            <div class="summary-item">
+                <div class="summary-label">Game</div>
+                <div class="summary-value">{{ listing.game.name }}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Status</div>
+                <div class="summary-value">{{ listing.status|capitalize }}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Seller</div>
+                <div class="summary-value">{{ listing.seller.username }}</div>
+            </div>
+        </section>
+    </div>
+
+    <aside class="sticky-panel">
+        <section class="detail-panel">
+            <div class="detail-body">
+                <div class="badge-row">
+                    <span class="game-badge"><i class="bi bi-controller"></i>{{ listing.game.name }}</span>
+                    {% if listing.status == "available" %}
+                        <span class="status-pill"><i class="bi bi-check2-circle"></i>Available</span>
+                    {% endif %}
+                </div>
+
+                <h1 class="detail-title">{{ listing.title }}</h1>
+                <div class="price-box">${{ listing.price }} <span>asking price</span></div>
+
+                <div class="info-box">
+                    <h2 class="section-title">Description</h2>
+                    <p class="description-text">{{ listing.description }}</p>
+                </div>
+
+                <div class="info-box">
+                    <h2 class="section-title">Seller</h2>
+                    <div class="seller-card">
+                        <img src="{{ url_for('static', filename='uploads/' + (listing.seller.profile_image or 'default.jpg')) }}" class="seller-avatar" alt="{{ listing.seller.username }}">
+                        <div>
+                            <div class="seller-name">{{ listing.seller.username }}</div>
+                            <div class="seller-role">Verified seller</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h2 class="section-title">Contact Seller</h2>
+                    <div class="contact-grid">
+                        {% if listing.seller.telegram %}
+                            <a href="{{ listing.seller.telegram }}" target="_blank" class="contact-btn primary">
+                                <i class="bi bi-telegram"></i>
+                                Telegram
+                            </a>
+                        {% endif %}
+
+                        {% if listing.seller.messenger %}
+                            <a href="{{ listing.seller.messenger }}" target="_blank" class="contact-btn">
+                                <i class="bi bi-messenger"></i>
+                                Messenger
+                            </a>
+                        {% endif %}
+
+                        {% if listing.seller.viber %}
+                            <a href="viber://chat?number={{ listing.seller.viber }}" class="contact-btn">
+                                <i class="bi bi-chat-dots"></i>
+                                Viber
+                            </a>
+                        {% endif %}
+
+                        {% if listing.seller.phone %}
+                            <a href="tel:{{ listing.seller.phone }}" class="contact-btn">
+                                <i class="bi bi-telephone"></i>
+                                Call
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="trust-row" aria-label="Marketplace trust notes">
+                <div class="trust-item">
+                    <i class="bi bi-shield-check"></i>
+                    Verified Seller
+                </div>
+                <div class="trust-item">
+                    <i class="bi bi-chat-square-dots"></i>
+                    Direct Contact
+                </div>
+                <div class="trust-item">
+                    <i class="bi bi-lightning-charge"></i>
+                    Fast Response
+                </div>
+            </div>
+        </section>
+    </aside>
+</div>
+
+<!-- FULLSCREEN GALLERY -->
+
+<div class="modal fade" id="galleryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content gallery-modal-content">
+            <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="modal-body p-0">
+                <div id="galleryCarousel" class="carousel slide h-100">
+                    <div class="carousel-inner h-100">
+
+                        <!-- COVER -->
+
+                        <div class="carousel-item active h-100">
+
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename='uploads/' + listing.image
+                                ) }}"
+                                class="fullscreen-image"
+                            >
+
+                        </div>
+
+                        <!-- EXTRA -->
+
+                        {% for image in listing.images %}
+
+                        <div class="carousel-item h-100">
+
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename='uploads/' + image.image
+                                ) }}"
+                                class="fullscreen-image"
+                            >
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <!-- PREV -->
+
+                    <button
+                        class="carousel-control-prev"
+                        type="button"
+                        data-bs-target="#galleryCarousel"
+                        data-bs-slide="prev"
+                    >
+
+                        <span class="carousel-control-prev-icon"></span>
+
+                    </button>
+
+                    <!-- NEXT -->
+
+                    <button
+                        class="carousel-control-next"
+                        type="button"
+                        data-bs-target="#galleryCarousel"
+                        data-bs-slide="next"
+                    >
+
+                        <span class="carousel-control-next-icon"></span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+body {
+
+    background: #0f1115;
+    color: white;
+
+}
+
+/* IMAGE */
+
+.detail-main-image {
+
+    height: 650px;
+
+    object-fit: contain;
+
+    background: #0a0c10;
+
+    border-radius: 24px;
+
+    cursor: pointer;
+}
+
+/* CARD */
+
+.premium-card {
+
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 28px;
+    padding: 40px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+
+}
+
+/* BADGE */
+
+.game-badge {
+
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: rgba(255,255,255,0.08);
+    color: #cfcfcf;
+    font-size: 14px;
+    margin-bottom: 20px;
+
+}
+
+/* TITLE */
+
+.listing-title {
+
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 24px;
+
+}
+
+/* PRICE */
+
+.price-box {
+
+    font-size: 34px;
+    font-weight: bold;
+    margin-bottom: 32px;
+    color: #ffffff;
+
+}
+
+/* SECTION */
+
+.section-title {
+
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #9ca3af;
+    margin-bottom: 14px;
+
+}
+
+/* DESCRIPTION */
+
+.description-box {
+
+    background: rgba(255,255,255,0.03);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 30px;
+    color: #d1d5db;
+    line-height: 1.8;
+
+}
+
+/* CONTACT */
+
+.contact-box {
+
+    margin-top: 10px;
+
+}
+
+/* BUTTONS */
+
+.premium-btn {
+
+    text-decoration: none;
+    text-align: center;
+    padding: 16px;
+    border-radius: 16px;
+    background: white;
+    color: black;
+    font-weight: 600;
+    transition: 0.3s ease;
+
+}
+
+.premium-btn:hover {
+
+    transform: translateY(-2px);
+    opacity: 0.9;
+    color: black;
+
+}
+
+.premium-btn-dark {
+
+    background: #1f2937;
+    color: white;
+
+}
+
+.premium-btn-dark:hover {
+
+    color: white;
+
+}
+
+/* CAROUSEL BUTTONS */
+
+.custom-control {
+
+    width: 50px;
+    height: 50px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0 20px;
+
+}
+
+/* MOBILE */
+
+@media(max-width: 991px){
+
+    .detail-main-image {
+
+        height: 420px;
+
+    }
+
+    .listing-title {
+
+        font-size: 32px;
+
+    }
+
+    .premium-card {
+
+        padding: 28px;
+
+    }
+
+}
+
+/* FULLSCREEN MODAL */
+
+.gallery-modal-content {
+
+    background: black;
+
+    border: none;
+}
+
+/* FULLSCREEN IMAGE */
+
+.fullscreen-image {
+
+    width: 100%;
+
+    height: 100vh;
+
+    object-fit: contain;
+
+    background: black;
+}
+
+/* THUMBNAIL ROW */
+
+.thumbnail-row {
+
+    display: flex;
+
+    gap: 14px;
+
+    overflow-x: auto;
+
+    padding-bottom: 6px;
+}
+
+/* THUMBNAIL */
+
+.thumbnail-image {
+
+    width: 110px;
+
+    height: 80px;
+
+    object-fit: cover;
+
+    border-radius: 14px;
+
+    cursor: pointer;
+
+    opacity: 0.6;
+
+    transition: 0.3s;
+
+    border:
+        2px solid transparent;
+
+    flex-shrink: 0;
+}
+
+/* HOVER */
+
+.thumbnail-image:hover {
+
+    opacity: 1;
+
+    transform: translateY(-2px);
+}
+
+/* ACTIVE */
+
+.active-thumb {
+
+    opacity: 1;
+
+    border:
+        2px solid white;
+}
+
+/* STICKY PANEL */
+
+.sticky-panel {
+
+    position: sticky;
+
+    top: 100px;
+}
+
+</style>
+
+<script>
+
+const carousel =
+    document.getElementById(
+        "listingCarousel"
+    )
+
+const thumbnails =
+    document.querySelectorAll(
+        ".thumbnail-image"
+    )
+
+carousel.addEventListener(
+    "slid.bs.carousel",
+    function(event) {
+
+        thumbnails.forEach(
+            thumb => {
+
+                thumb.classList.remove(
+                    "active-thumb"
+                )
+            }
+        )
+
+        thumbnails[
+            event.to
+        ].classList.add(
+            "active-thumb"
+        )
+    }
+)
+
+</script>
+
+{% endblock %}
