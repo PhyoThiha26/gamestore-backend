@@ -114,7 +114,7 @@ def add_listing():
             price=price,
             game_id=game_id,
             # image=filename,
-            image=image_url
+            image=image_url,
             buy_price=buy_price,
             seller_id = session["user_id"]
         )
