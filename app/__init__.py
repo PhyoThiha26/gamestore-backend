@@ -16,12 +16,7 @@ def create_app():
 
     app.config.from_object(Config)
 
-    CORS(
-        app,
-        origins=[
-            "https://your-vercel-app.vercel.app"
-        ]
-    )
+    CORS(app)
 
     db.init_app(app)
 
