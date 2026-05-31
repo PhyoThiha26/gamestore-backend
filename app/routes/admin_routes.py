@@ -91,8 +91,12 @@ def add_listing():
                 "app/static/uploads",
                 filename
             )
+            print("Saving image to:", image_path)
 
             image.save(image_path)
+
+            print("File exists after save:",
+                os.path.exists(image_path))
 
         listing = Listing(
             title=title,
