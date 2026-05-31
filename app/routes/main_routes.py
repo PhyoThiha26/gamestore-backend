@@ -3,11 +3,10 @@ from flask import (
     render_template,
     request
 )
-from urllib.parse import urlencode
 
 from app.models import Listing,Game,User
 
-from sqlalchemy import Float, cast, or_
+from sqlalchemy import or_
 
 
 main = Blueprint(
@@ -80,15 +79,9 @@ def view_all(game_id):
 
     page = request.args.get("page", 1, type=int)
     search = request.args.get("search", "").strip()
-    sort = request.args.get("sort", "newest")
-    min_price = request.args.get("min_price", type=float)
-    max_price = request.args.get("max_price", type=float)
-    selected_game_id = request.args.get("game_id", game_id, type=int)
     
-    query = Listing.query.filter_by(status="available")
-
-    if selected_game_id:
-        query = query.filter(Listing.game_id == selected_game_id)
+    query = Listing.query.filter_by(status="available",
+                                    game_id = game_id)
 
     if search:
         query = query.filter(
@@ -98,38 +91,14 @@ def view_all(game_id):
             )
         )
 
-    numeric_price = cast(Listing.price, Float)
-
-    if min_price is not None:
-        query = query.filter(numeric_price >= min_price)
-
-    if max_price is not None:
-        query = query.filter(numeric_price <= max_price)
-
-    if sort == "price_asc":
-        query = query.order_by(numeric_price.asc(), Listing.created_at.desc())
-    elif sort == "price_desc":
-        query = query.order_by(numeric_price.desc(), Listing.created_at.desc())
-    else:
-        query = query.order_by(
-            Listing.featured.desc(),
-            Listing.created_at.desc()
-        )
-
-    query_args = request.args.to_dict()
-    query_args.pop("page", None)
-
-    pagination = query.paginate(page=page, per_page=12)
+    pagination = query.order_by(
+        Listing.featured.desc(),
+        Listing.created_at.desc()
+    ).paginate(page=page, per_page=12)
 
     return render_template(
         "view_all.html",
         listings=pagination.items,
-        pagination=pagination,
-        games=Game.query.order_by(Game.name.asc()).all(),
-        selected_game_id=selected_game_id,
-        sort=sort,
-        min_price=request.args.get("min_price", ""),
-        max_price=request.args.get("max_price", ""),
-        query_string=urlencode(query_args)
+        pagination=pagination
     )
 

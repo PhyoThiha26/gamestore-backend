@@ -318,34 +318,18 @@
 
 <section class="filter-panel" aria-label="Listing filters">
     <form method="GET" class="row g-3 align-items-end">
-        <div class="col-lg-4">
+        <div class="col-lg-7">
             <label class="filter-label" for="search">Search</label>
             <input id="search" type="text" name="search" class="form-control store-input" placeholder="Search accounts..." value="{{ request.args.get('search', '') }}">
         </div>
-        <div class="col-lg-2">
+        <div class="col-lg-3">
             <label class="filter-label" for="game_id">Game</label>
             <select id="game_id" name="game_id" class="form-select store-input">
                 <option value="">All Games</option>
                 {% for game in games %}
-                    <option value="{{ game.id }}" {% if selected_game_id == game.id %}selected{% endif %}>{{ game.name }}</option>
+                    <option value="{{ game.id }}" {% if request.args.get('game_id') == game.id|string %}selected{% endif %}>{{ game.name }}</option>
                 {% endfor %}
             </select>
-        </div>
-        <div class="col-lg-2">
-            <label class="filter-label" for="sort">Sort</label>
-            <select id="sort" name="sort" class="form-select store-input">
-                <option value="newest" {% if sort == "newest" %}selected{% endif %}>Featured/Newest</option>
-                <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Price: Low to High</option>
-                <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Price: High to Low</option>
-            </select>
-        </div>
-        <div class="col-lg-1">
-            <label class="filter-label" for="min_price">Min</label>
-            <input id="min_price" type="number" step="0.01" min="0" name="min_price" class="form-control store-input" placeholder="0" value="{{ min_price }}">
-        </div>
-        <div class="col-lg-1">
-            <label class="filter-label" for="max_price">Max</label>
-            <input id="max_price" type="number" step="0.01" min="0" name="max_price" class="form-control store-input" placeholder="Any" value="{{ max_price }}">
         </div>
         <div class="col-lg-2">
             <button type="submit" class="filter-btn">
@@ -404,7 +388,7 @@
         <ul class="pagination gap-1 mb-0">
             {% if pagination.has_prev %}
                 <li class="page-item">
-                    <a class="page-link premium-page" href="?page={{ pagination.prev_num }}{% if query_string %}&{{ query_string }}{% endif %}" aria-label="Previous page">
+                    <a class="page-link premium-page" href="?page={{ pagination.prev_num }}{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}{% if request.args.get('game_id') %}&game_id={{ request.args.get('game_id') }}{% endif %}" aria-label="Previous page">
                         <i class="bi bi-chevron-left"></i>
                     </a>
                 </li>
@@ -413,7 +397,7 @@
             {% for page_num in pagination.iter_pages() %}
                 {% if page_num %}
                     <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
-                        <a class="page-link premium-page" href="?page={{ page_num }}{% if query_string %}&{{ query_string }}{% endif %}">{{ page_num }}</a>
+                        <a class="page-link premium-page" href="?page={{ page_num }}{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}{% if request.args.get('game_id') %}&game_id={{ request.args.get('game_id') }}{% endif %}">{{ page_num }}</a>
                     </li>
                 {% else %}
                     <li class="page-item disabled"><span class="page-link premium-page">...</span></li>
@@ -422,7 +406,7 @@
 
             {% if pagination.has_next %}
                 <li class="page-item">
-                    <a class="page-link premium-page" href="?page={{ pagination.next_num }}{% if query_string %}&{{ query_string }}{% endif %}" aria-label="Next page">
+                    <a class="page-link premium-page" href="?page={{ pagination.next_num }}{% if request.args.get('search') %}&search={{ request.args.get('search') }}{% endif %}{% if request.args.get('game_id') %}&game_id={{ request.args.get('game_id') }}{% endif %}" aria-label="Next page">
                         <i class="bi bi-chevron-right"></i>
                     </a>
                 </li>

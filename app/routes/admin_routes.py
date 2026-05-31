@@ -79,31 +79,42 @@ def add_listing():
             "detail_images"
         )
 
-        filename = None
+        # filename = None
 
-        if image:
+        # if image:
 
-            filename = secure_filename(
-                image.filename
-            )
+        #     filename = secure_filename(
+        #         image.filename
+        #     )
 
-            image_path = os.path.join(
-                "app/static/uploads",
-                filename
-            )
-            print("Saving image to:", image_path)
+        #     image_path = os.path.join(
+        #         "app/static/uploads",
+        #         filename
+        #     )
+        #     print("Saving image to:", image_path)
 
-            image.save(image_path)
+        #     image.save(image_path)
 
-            print("File exists after save:",
-                os.path.exists(image_path))
+        #     print("File exists after save:",
+        #         os.path.exists(image_path))
+
+        import cloudinary.uploader
+
+        image_url = None
+
+        if image and image.filename:
+
+            result = cloudinary.uploader.upload(image)
+
+            image_url = result["secure_url"]
 
         listing = Listing(
             title=title,
             description=description,
             price=price,
             game_id=game_id,
-            image=filename,
+            # image=filename,
+            image=image_url
             buy_price=buy_price,
             seller_id = session["user_id"]
         )
@@ -116,19 +127,13 @@ def add_listing():
 
             if img.filename:
 
-                detail_filename = secure_filename(
-                    img.filename
-                )
+                result = cloudinary.uploader.upload(img)
 
-                detail_path = os.path.join(
-                    "app/static/uploads",detail_filename
-                )
-
-                img.save(detail_path)
+                detail_url = result["secure_url"]
 
                 new_image = ListingImage(
 
-                    image=detail_filename,
+                    image=detail_url,
 
                     listing_id=listing.id
                 )

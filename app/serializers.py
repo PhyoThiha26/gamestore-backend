@@ -1,19 +1,29 @@
 from flask import url_for
 
 
-def upload_url(filename):
-    if not filename:
-        return None
+# def upload_url(filename):
+#     if not filename:
+#         return None
 
-    return url_for("static", filename=f"uploads/{filename}", _external=True)
+#     return url_for("static", filename=f"uploads/{filename}", _external=True)
 
+# def upload_url(image):
+#     if not image:
+#         return None
+
+#     # already full URL (Cloudinary or external)
+#     if image.startswith("http://") or image.startswith("https://"):
+#         return image
+
+#     # fallback for old local files
+#     return url_for("static", filename=f"uploads/{image}", _external=True)
 
 def serialize_game(game):
     return {
         "id": game.id,
         "name": game.name,
         "image": game.image,
-        "image_url": upload_url(game.image),
+        # "image_url": upload_url(game.image),
         "telegram": game.telegram,
         "messenger": game.messenger,
         "viber": game.viber,
