@@ -4,6 +4,9 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 
 from config import Config
+import pymysql
+pymysql.converters.encoders[str] = lambda s: s.encode("utf-8")
+pymysql.converters.decoders["UTF8"] = lambda b: b.decode("utf-8")
 
 db = SQLAlchemy()
 
