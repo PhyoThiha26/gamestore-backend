@@ -7,16 +7,16 @@ from flask import url_for
 
 #     return url_for("static", filename=f"uploads/{filename}", _external=True)
 
-# def upload_url(image):
-#     if not image:
-#         return None
+def upload_url(image):
+    if not image:
+        return None
 
-#     # already full URL (Cloudinary or external)
-#     if image.startswith("http://") or image.startswith("https://"):
-#         return image
+    # already full URL (Cloudinary or external)
+    if image.startswith("http://") or image.startswith("https://"):
+        return image
 
-#     # fallback for old local files
-#     return url_for("static", filename=f"uploads/{image}", _external=True)
+    # fallback for old local files
+    return url_for("static", filename=f"uploads/{image}", _external=True)
 
 def serialize_game(game):
     return {
