@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 from config import Config
 
@@ -14,6 +15,13 @@ def create_app():
 
 
     app.config.from_object(Config)
+
+    CORS(
+        app,
+        origins=[
+            "https://your-vercel-app.vercel.app"
+        ]
+    )
 
     db.init_app(app)
 
