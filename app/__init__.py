@@ -1,10 +1,19 @@
+import pymysql
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
-
 from config import Config
-import pymysql
+
+
+# from flask import Flask
+# from flask_sqlalchemy import SQLAlchemy
+# from flask_migrate import Migrate
+# from flask_cors import CORS
+
+# from config import Config
+# import pymysql
+# import os
 pymysql.converters.encoders[str] = lambda s: s.encode("utf-8")
 pymysql.converters.decoders["UTF8"] = lambda b: b.decode("utf-8")
 
@@ -13,18 +22,16 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 def create_app():
-
-    app = Flask(__name__)
-
-
-    app.config.from_object(Config)
-
+    import os
     import cloudinary
 
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
     cloudinary.config(
-        cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-        api_key=os.getenv("CLOUDINARY_API_KEY"),
-        api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+        cloud_name=app.config.get("CLOUDINARY_CLOUD_NAME") or os.getenv("CLOUDINARY_CLOUD_NAME"),
+        api_key=app.config.get("CLOUDINARY_API_KEY") or os.getenv("CLOUDINARY_API_KEY"),
+        api_secret=app.config.get("CLOUDINARY_API_SECRET") or os.getenv("CLOUDINARY_API_SECRET"),
         secure=True
     )
 

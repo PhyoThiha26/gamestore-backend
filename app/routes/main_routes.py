@@ -79,6 +79,9 @@ def view_all(game_id):
 
     page = request.args.get("page", 1, type=int)
     search = request.args.get("search", "").strip()
+    sort = request.args.get("sort", "newest")
+    min_price = request.args.get("min_price", type=float)
+    max_price = request.args.get("max_price", type=float)
     
     query = Listing.query.filter_by(status="available",
                                     game_id = game_id)
@@ -91,14 +94,35 @@ def view_all(game_id):
             )
         )
 
-    pagination = query.order_by(
-        Listing.featured.desc(),
-        Listing.created_at.desc()
-    ).paginate(page=page, per_page=12)
+    numeric_price = cast(Listing.price, Float)
+
+    if min_price is not None:
+        query = query.filter(numeric_price >= min_price)
+
+    if max_price is not None:
+        query = query.filter(numeric_price <= max_price)
+
+    if sort == "price_asc":
+        query = query.order_by(numeric_price.asc())
+    elif sort == "price_desc":
+        query = query.order_by(numeric_price.desc())
+    else:
+        query = query.order_by(
+            Listing.featured.desc(),
+            Listing.created_at.desc()
+        )
+
+
+    pagination = query.paginate(page=page, per_page=12)
+
 
     return render_template(
         "view_all.html",
         listings=pagination.items,
-        pagination=pagination
+        pagination=pagination,
+        search=search,
+        sort=sort,
+        min_price=request.args.get("min_price", ""),
+        max_price=request.args.get("max_price", "")
     )
 
