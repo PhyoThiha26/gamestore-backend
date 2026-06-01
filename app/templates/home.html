@@ -406,13 +406,15 @@
 
             <div class="listing-meta">
                 <div class="listing-price">{{ listing.price }}</div>
-                {% if listing.featured %}
+                {% if listing.sale_type == "rental" %}
                     <span class="status-pill"><i class="bi bi-lightning-charge-fill"></i>For Rental</span>
 
-                {% else %}
+                {% elif listing.sale_type == "sale" %}
 
                     <span class="status-pill"><i class="bi bi-lightning-charge-fill"></i>For Sale</span>
+                {% else %}
 
+                    <span class="status-pill"><i class="bi bi-lightning-charge-fill"></i>something wrong</span>
                 {% endif %}
             </div>
 

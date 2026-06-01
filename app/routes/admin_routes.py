@@ -73,6 +73,8 @@ def add_listing():
                 
         game_id = request.form.get("game_id")
 
+        sale_type = request.form.get("sale_type")
+
         image = request.files.get("image")
 
         detail_images = request.files.getlist(
@@ -116,6 +118,7 @@ def add_listing():
             # image=filename,
             image=image_url,
             buy_price=buy_price,
+            sale_type=sale_type,
             seller_id = session["user_id"]
         )
 

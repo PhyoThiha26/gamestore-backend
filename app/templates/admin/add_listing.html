@@ -314,7 +314,7 @@
                 <textarea id="listingDescription" name="description" rows="8" class="form-control admin-input" placeholder="Describe skins, ranks, heroes, weapons, achievements, badges, and rare details..." required></textarea>
             </div>
 
-            <div class="row g-3">
+            <div class="row g-4">
                 <div class="col-md-4">
                     <label class="form-label" for="listingPrice">Selling Price</label>
                     <input id="listingPrice"  step="0.01" name="price" class="form-control admin-input" placeholder="100.00" required>
@@ -330,6 +330,15 @@
                         {% for game in games %}
                             <option value="{{ game.id }}">{{ game.name }}</option>
                         {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="sale_type">Type</label>
+                    <select id="sale_type" name="sale_type" class="form-select admin-input" required>
+                        <option value="" disabled selected hidden>Select a type</option>
+                        
+                            <option value="rental">Rental</option>
+                            <option value="sale">Sale</option>
                     </select>
                 </div>
             </div>
