@@ -23,7 +23,7 @@ def serialize_game(game):
         "id": game.id,
         "name": game.name,
         "image": game.image,
-        # "image_url": upload_url(game.image),
+        "image_url": upload_url(game.image),
         "telegram": game.telegram,
         "messenger": game.messenger,
         "viber": game.viber,
