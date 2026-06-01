@@ -94,18 +94,17 @@ def view_all(game_id):
             )
         )
 
-    numeric_price = cast(Listing.price, Float)
 
     if min_price is not None:
-        query = query.filter(numeric_price >= min_price)
+        query = query.filter(Listing.price >= min_price)
 
     if max_price is not None:
-        query = query.filter(numeric_price <= max_price)
+        query = query.filter(Listing.price <= max_price)
 
     if sort == "price_asc":
-        query = query.order_by(numeric_price.asc())
+        query = query.order_by(Listing.price.asc())
     elif sort == "price_desc":
-        query = query.order_by(numeric_price.desc())
+        query = query.order_by(Listing.price.desc())
     else:
         query = query.order_by(
             Listing.featured.desc(),

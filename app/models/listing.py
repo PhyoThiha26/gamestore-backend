@@ -19,7 +19,7 @@ class Listing(db.Model):
     )
 
     price = db.Column(
-        db.String(200),
+        db.Float,
         nullable=False
     )
 
