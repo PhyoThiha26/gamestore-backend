@@ -364,11 +364,15 @@ def admin_dashboard():
     total_spending = sum(
         listing.buy_price or 0
         for listing in listings
+
+        if listing.sale_type == "sale"
     )
 
     total_revenue = sum(
         listing.sold_price or 0
         for listing in listings
+
+        if listing.sale_type == "sale"
     )
 
     total_profit = sum(
@@ -379,7 +383,9 @@ def admin_dashboard():
 
         for listing in listings
 
-        if listing.status == "sold"
+        if (
+            listing.status == "sold"
+            and listing.sale_type == "sale"
     )
 
     profit_by_day = defaultdict(float)
