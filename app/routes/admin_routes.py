@@ -386,6 +386,7 @@ def admin_dashboard():
         if (
             listing.status == "sold"
             and listing.sale_type == "sale"
+        )
     )
 
     profit_by_day = defaultdict(float)
