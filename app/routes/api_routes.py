@@ -25,6 +25,12 @@ def find_game_by_names(names):
 def apply_listing_filters(query):
     search = request.args.get("search", "").strip()
     game_id = request.args.get("game_id", type=int)
+    min_price = request.args.get("min_price", type=float)
+    max_price = request.args.get("max_price", type=float)
+
+    
+    if game_id:
+        query = query.filter(Listing.game_id == game_id)
 
     if search:
         query = query.filter(
@@ -33,9 +39,11 @@ def apply_listing_filters(query):
                 Listing.description.ilike(f"%{search}%"),
             )
         )
+    if min_price is not None:
+        query = query.filter(Listing.price >= min_price)
 
-    if game_id:
-        query = query.filter(Listing.game_id == game_id)
+    if max_price is not None:
+        query = query.filter(Listing.price <= max_price)
 
     return query
 
@@ -93,11 +101,20 @@ def home():
 
 @api.get("/listings")
 def listings():
+    sort = request.args.get("sort", "newest")
     query = apply_listing_filters(available_listings_query())
-    listings_list = query.order_by(
-        Listing.featured.desc(),
-        Listing.created_at.desc(),
-    ).all()
+    
+    if sort == "price_asc":
+        query = query.order_by(Listing.price.asc())
+    elif sort == "price_desc":
+        query = query.order_by(Listing.price.desc())
+    else:
+        query = query.order_by(
+            Listing.featured.desc(),
+            Listing.created_at.desc(),
+        )
+    
+    listings_list = query.all()
 
     return jsonify([
         serialize_listing(listing)
