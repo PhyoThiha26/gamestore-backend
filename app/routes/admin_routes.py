@@ -483,20 +483,32 @@ def seller_profile():
             "profile_image"
         )
 
-        if image and image.filename != "":
+        import cloudinary.uploader
 
-            filename = secure_filename(
-                image.filename
-            )
+        image_url = None
 
-            image_path = os.path.join(
-                "app/static/uploads",
-                filename
-            )
+        if image and image.filename:
 
-            image.save(image_path)
+            result = cloudinary.uploader.upload(image)
 
-            user.profile_image = filename
+            image_url = result["secure_url"]
+
+        # if image and image.filename != "":
+
+        #     filename = secure_filename(
+        #         image.filename
+        #     )
+
+        #     image_path = os.path.join(
+        #         "app/static/uploads",
+        #         filename
+        #     )
+
+        #     image.save(image_path)
+
+        #     user.profile_image = filename
+
+        user.profile_image = image
 
         db.session.commit()
 
