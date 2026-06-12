@@ -508,7 +508,9 @@ def seller_profile():
 
         #     user.profile_image = filename
 
-        user.profile_image = image
+        user.profile_image = image_url
+
+        
 
         db.session.commit()
 
