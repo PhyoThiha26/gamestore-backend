@@ -90,3 +90,18 @@ def serialize_listing(listing, include_details=False):
         )
 
     return data
+
+
+def serialize_listing_card(listing):
+    return {
+        "id": listing.id,
+        "title": listing.title,
+        "price": listing.price,
+        "rank": listing.rank,
+        "server": listing.server,
+        "image_url": upload_url(listing.image),
+        "featured": listing.featured,
+        "sale_type": listing.sale_type,
+        "game": listing.game.name if listing.game else None,
+        "seller": serialize_seller(listing.seller),
+    }

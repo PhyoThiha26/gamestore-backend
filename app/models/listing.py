@@ -20,7 +20,9 @@ class Listing(db.Model):
 
     price = db.Column(
         db.Float,
-        nullable=False
+        nullable=False,
+        index=True
+
     )
 
     rank = db.Column(
@@ -37,12 +39,14 @@ class Listing(db.Model):
 
     status = db.Column(
         db.String(20),
-        default="available"
+        default="available",
+        index=True
     )
 
     game_id = db.Column(
         db.Integer,
-        db.ForeignKey("game.id")
+        db.ForeignKey("game.id"),
+        index=True
     )
 
     game = db.relationship(
@@ -66,7 +70,8 @@ class Listing(db.Model):
 
     featured = db.Column(
         db.Boolean,
-        default= False
+        default= False,
+        index=True
 
     )               
 

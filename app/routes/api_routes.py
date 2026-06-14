@@ -1,26 +1,40 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.models import Game, Listing
-from app.serializers import serialize_game, serialize_listing
+from app.serializers import serialize_game, serialize_listing,serialize_listing_card
 
 
 api = Blueprint("api", __name__, url_prefix="/api")
 
 
 def available_listings_query():
-    return Listing.query.filter_by(status="available")
+    return Listing.query.options(
+        joinedload(Listing.game),
+        joinedload(Listing.seller),
+    ).filter_by(status="available")
 
+
+# def find_game_by_names(games_list, names):
+#     normalized_names = {name.lower() for name in names}
+
+#     for game in games_list:
+#         if game.name.lower() in normalized_names:
+#             return game
+
+#     return None
+
+from sqlalchemy import func
 
 def find_game_by_names(names):
-    normalized_names = {name.lower() for name in names}
+    names = [name.lower() for name in names]
 
-    for game in Game.query.all():
-        if game.name.lower() in normalized_names:
-            return game
-
-    return None
-
+    return (
+        Game.query
+        .filter(func.lower(Game.name).in_(names))
+        .first()
+    )
 
 def apply_listing_filters(query):
     search = request.args.get("search", "").strip()
@@ -63,10 +77,61 @@ def games():
     ])
 
 
+# @api.get("/home")
+# def home():
+#     games_list = Game.query.order_by(Game.name.asc()).all()
+#     ml_game = find_game_by_names(games_list, ["mobile legends", "mobile legend", "mlbb"])
+#     pubg_game = find_game_by_names(games_list, ["pubg", "pubg mobile"])
+
+#     def section_listings(game):
+#         query = available_listings_query()
+
+#         if game:
+#             query = query.filter(Listing.game_id == game.id)
+
+#         query = apply_listing_filters(query)
+
+#         return query.order_by(
+#             Listing.featured.desc(),
+#             Listing.created_at.desc(),
+#         ).limit(12).all()
+
+#     return jsonify(
+#         {
+#             "games": [
+#                 serialize_game(game)
+#                 for game in games_list
+#             ],
+#             "mobile_legends_listings": [
+#                 serialize_listing(listing)
+#                 for listing in section_listings(ml_game)
+#             ],
+#             "pubg_listings": [
+#                 serialize_listing(listing)
+#                 for listing in section_listings(pubg_game)
+#             ],
+#         }
+#     )
+
 @api.get("/home")
 def home():
-    ml_game = find_game_by_names(["mobile legends", "mobile legend", "mlbb"])
-    pubg_game = find_game_by_names(["pubg", "pubg mobile"])
+    games = Game.query.order_by(Game.name.asc()).all()
+
+    ml_game = next(
+        (
+            g for g in games
+            if g.name.lower() in ["mobile legends", "mobile legend", "mlbb"]
+        ),
+        None,
+    )
+
+    pubg_game = next(
+        (
+            g for g in games
+            if g.name.lower() in ["pubg", "pubg mobile"]
+        ),
+        None,
+    )
 
     def section_listings(game):
         query = available_listings_query()
@@ -76,32 +141,34 @@ def home():
 
         query = apply_listing_filters(query)
 
-        return query.order_by(
-            Listing.featured.desc(),
-            Listing.created_at.desc(),
-        ).limit(12).all()
+        return (
+            query.order_by(
+                Listing.featured.desc(),
+                Listing.created_at.desc(),
+            )
+            .limit(12)
+            .all()
+        )
 
-    return jsonify(
-        {
-            "games": [
-                serialize_game(game)
-                for game in Game.query.order_by(Game.name.asc()).all()
-            ],
-            "mobile_legends_listings": [
-                serialize_listing(listing)
-                for listing in section_listings(ml_game)
-            ],
-            "pubg_listings": [
-                serialize_listing(listing)
-                for listing in section_listings(pubg_game)
-            ],
-        }
-    )
-
+    return jsonify({
+        "games": [serialize_game(game) for game in games],
+        "mobile_legends_listings": [
+            serialize_listing_card(listing)
+            for listing in section_listings(ml_game)
+        ],
+        "pubg_listings": [
+            serialize_listing_card(listing)
+            for listing in section_listings(pubg_game)
+        ],
+    })
 
 @api.get("/listings")
 def listings():
     sort = request.args.get("sort", "newest")
+
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
+
     query = apply_listing_filters(available_listings_query())
     
     if sort == "price_asc":
@@ -114,16 +181,49 @@ def listings():
             Listing.created_at.desc(),
         )
     
-    listings_list = query.all()
+    pagination = query.paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
 
-    return jsonify([
-        serialize_listing(listing)
-        for listing in listings_list
-    ])
+
+#     query = (
+#     apply_listing_filters(available_listings_query())
+#     .options(
+#         joinedload(Listing.game),
+#         joinedload(Listing.seller)
+#     )
+# )
+
+    return jsonify({
+        "items": [
+           serialize_listing_card(listing)
+            for listing in pagination.items
+        ],
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "total": pagination.total,
+        "has_next": pagination.has_next,
+        "has_prev": pagination.has_prev,
+    })
+    # return jsonify([
+    #     serialize_listing_card(listing)
+    #     for listing in listings_list
+    # ])
 
 
 @api.get("/listings/<int:listing_id>")
 def listing_details(listing_id):
-    listing = Listing.query.get_or_404(listing_id)
+    listing = (
+        Listing.query
+        .options(
+            joinedload(Listing.game),
+            joinedload(Listing.seller),
+            selectinload(Listing.images),
+        )
+        .filter(Listing.id == listing_id)
+        .first_or_404()
+    )
 
     return jsonify(serialize_listing(listing, include_details=True))
