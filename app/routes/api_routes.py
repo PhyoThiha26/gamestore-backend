@@ -167,7 +167,7 @@ def listings():
     sort = request.args.get("sort", "newest")
 
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 20, type=int)
+    per_page = request.args.get("per_page", 6, type=int)
 
     query = apply_listing_filters(available_listings_query())
     
