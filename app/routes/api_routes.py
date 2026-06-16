@@ -181,38 +181,38 @@ def listings():
             Listing.created_at.desc(),
         )
     
-    # pagination = query.paginate(
-    #     page=page,
-    #     per_page=per_page,
-    #     error_out=False
-    # )
-
-
-    query = (
-    apply_listing_filters(available_listings_query())
-    .options(
-        joinedload(Listing.game),
-        joinedload(Listing.seller)
+    pagination = query.paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
     )
-)
 
-    listings_list = query.all()
 
-    # return jsonify({
-    #     "items": [
-    #        serialize_listing_card(listing)
-    #         for listing in pagination.items
-    #     ],
-    #     "page": pagination.page,
-    #     "pages": pagination.pages,
-    #     "total": pagination.total,
-    #     "has_next": pagination.has_next,
-    #     "has_prev": pagination.has_prev,
-    # })
-    return jsonify([
-        serialize_listing_card(listing)
-        for listing in listings_list
-    ])
+#     query = (
+#     apply_listing_filters(available_listings_query())
+#     .options(
+#         joinedload(Listing.game),
+#         joinedload(Listing.seller)
+#     )
+# )
+
+    # listings_list = query.all()
+
+    return jsonify({
+        "items": [
+           serialize_listing_card(listing)
+            for listing in pagination.items
+        ],
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "total": pagination.total,
+        "has_next": pagination.has_next,
+        "has_prev": pagination.has_prev,
+    })
+    # return jsonify([
+    #     serialize_listing_card(listing)
+    #     for listing in listings_list
+    # ])
 
 
 @api.get("/listings/<int:listing_id>")
