@@ -397,7 +397,10 @@
                     <tr>
                         <td>
                             <div class="d-flex align-items-center gap-3">
-                                <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" class="admin-thumb" alt="">
+                                <img
+                                    src="{{ listing.image }}"
+                                    class="admin-thumb"
+                                >
                                 <div class="min-w-0">
                                     <div class="listing-title">{{ listing.title }}</div>
                                     <span class="text-secondary font-monospace" style="font-size: 0.72rem;">ID: #{{ listing.id }}</span>

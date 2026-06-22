@@ -179,10 +179,7 @@
                     <label class="form-label mb-3">Identity Avatar</label>
                     
                     <div class="profile-upload-wrapper">
-                        <img
-                        src="{{ user.profile_image or url_for('static', filename='default.jpg') }}"
-                        class="profile-avatar"
-                        > 
+                        <img  src="{{ user.profile_image or url_for('static', filename='default.jpg') }}"
                              class="profile-preview-image" 
                              id="profilePreview" 
                              alt="Seller Avatar Image Source">

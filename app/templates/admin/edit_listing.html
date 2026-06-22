@@ -177,7 +177,10 @@
                             <p class="media-card-subtitle">Active visual representation preview</p>
                             
                             <div class="text-center mb-4">
-                                <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" 
+                                <img
+                                    src="{{ listing.image }}"
+                                    
+                                > 
                                      class="edit-preview" 
                                      id="livePreviewContainer"
                                      data-bs-toggle="modal" 
