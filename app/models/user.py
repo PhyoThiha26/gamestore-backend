@@ -24,11 +24,11 @@ class User(db.Model):
     default="customer"
     )
 
-    listings = db.relationship(
-        "Listing",
-        backref="seller",
-        lazy=True
-    )
+    # listings = db.relationship(
+    #     "Listing",
+    #     backref="seller",
+    #     lazy=True
+    # )
 
     profile_image = db.Column(
     db.String(255)
