@@ -40,12 +40,14 @@ class Listing(db.Model):
     status = db.Column(
         db.String(20),
         default="available",
+        nullable=False,
         index=True
     )
 
     game_id = db.Column(
         db.Integer,
         db.ForeignKey("game.id"),
+        nullable=False,
         index=True
     )
 
@@ -56,7 +58,8 @@ class Listing(db.Model):
 
     created_at = db.Column(
         db.DateTime,
-        default = datetime.utcnow
+        default = datetime.utcnow,
+        index=True
     )
 
     images = db.relationship(
@@ -77,16 +80,19 @@ class Listing(db.Model):
 
     seller_id = db.Column(
         db.Integer,
-        db.ForeignKey("user.id")
+        db.ForeignKey("user.id"),
+        nullable=False,
+        index=True
     )
 
-    user = db.relationship(
+    seller = db.relationship(
         "User",
-        backref="listing"
+        backref="listings"
     )
 
     buy_price = db.Column(
         db.Float,
+        nullable=False,
         default=0
     )
 
@@ -103,6 +109,16 @@ class Listing(db.Model):
     sale_type = db.Column(
         db.String(50),
         nullable = True,
-        default = "sale"
+        default = "sale",
+        index=True
+    )
+
+    __table_args__ = (
+        db.Index(
+            "idx_listing_home",
+            "status",
+            "featured",
+            "created_at"
+        ),
     )
 
