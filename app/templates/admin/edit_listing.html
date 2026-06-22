@@ -211,7 +211,8 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content preview-modal-content">
             <div class="modal-body p-0 text-center">
-                <img src="{{ url_for('static', filename='uploads/' + (listing.image or 'default.jpg')) }}" 
+                <img
+                     src="{{ listing.image }}" 
                      class="full-preview-image" 
                      id="modalImageReference"
                      alt="Full Resolution View Asset">
