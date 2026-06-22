@@ -61,6 +61,8 @@ def create_app():
 
     app.register_blueprint(api)
 
-    
+    from app.routes.admin_api_routes import admin_api
+
+    app.register_blueprint(admin_api)
 
     return app
