@@ -65,4 +65,8 @@ def create_app():
 
     app.register_blueprint(admin_api)
 
+    from app.routes.auth_api_routes import auth_api
+
+    app.register_blueprint(auth_api)
+
     return app
